@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+  "name": "Ethics in Shopping",
+  "description": "Helps you make ethical shopping decisions on the Sainsburys website",
+  "version": "0.1",
+
+  "browser_action": {
+    "default_icon": {                         
+            "32": "images/icon32.png"           
+    },
+    "default_popup": "popup.html",
+    "default_title": "Ethics in Shopping"
+  },
+
+  "background": {
+     "scripts": ["thirdParty/jquery-3.4.0.min.js", "background.js"]
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://www.sainsburys.co.uk/*"],
+      "js": ["thirdParty/jquery-3.4.0.min.js", "thirdParty/fuzzy.min.js", "sainsburys.js"]
+    }
+  ],
+
+  "permissions": [
+    "https://www.sainsburys.co.uk/*",
+    "https://www.ethicalconsumer.org/*"
+    //,"storage",
+    //"tabs"
+  ]
+}
