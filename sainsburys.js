@@ -25,40 +25,51 @@ function apply_colour(product_div,bestbuys,colour) {
 function colour_product(response, product_div) {
     // is this a best buy?
     $(product_div).parent().css('background-color','transparent');
-    apply_colour(product_div,response.table.bad,'#FF8686'); // light red
-    apply_colour(product_div,response.table.average,'#FFCE79'); // light orange
-    apply_colour(product_div,response.bestbuys,'#b5ffb6'); // light green
-    apply_colour(product_div,response.table.good,'#b5ffb6'); // light green
+    Object.values(response).forEach(value => {
+        if (typeof(value.error) !== 'undefined') {
+            console.log("Skipping due to error: "+value);
+            return;
+        }
+
+        apply_colour(product_div,value.table.bad,'#FF8686'); // light red
+        apply_colour(product_div,value.table.average,'#FFCE79'); // light orange
+        apply_colour(product_div,value.bestbuys,'#b5ffb6'); // light green
+        apply_colour(product_div,value.table.good,'#b5ffb6'); // light green
+      });
 }   
 
 function colour_page(response) {
     // find the products
-    console.log($('.productNameandPromotions'));
 
     // set them all grey while i think...
+    // search results
     $('.productNameAndPromotions').parent().css('background-color','lightGrey'); 
     $('.productNameAndPromotions').each( function( index, product_div ){
         colour_product(response, product_div);
     });
 
+    //viewing single product
     $('.productTitleDescriptionContainer').parent().css('background-color','lightGrey'); 
     $('.productTitleDescriptionContainer').each( function( index, product_div ){
         colour_product(response, product_div);
     });
+
+    //shopping basket
+    $('.productContainer').parent().css('background-color','lightGrey'); 
+    $('.productContainer').each( function( index, product_div ){
+        colour_product(response, product_div);
+    });
 }
 
-function get_bestbuys(food) {
-    chrome.runtime.sendMessage({command: "get_bestbuys", food:food}, function(response) {
+function get_bestbuys() {
+    chrome.runtime.sendMessage({command: "get_bestbuys"}, function(response) {
         if(response.error) {
             console.log(response.error);
             console.log(response.data);
             return;
         } 
 
-        console.log(response.bestbuys);
-        console.log(response.table.good);
-        console.log(response.table.average);
-        console.log(response.table.bad);
+        console.log(response);
         colour_page(response);
         return;
         
@@ -82,8 +93,7 @@ function waitForReady(){
             // we run our code periodically to deal with sainsburys nuking my bg colours
             //setInterval(JiraAddButtons, 5000);
             setInterval(function(){ 
-                get_bestbuys("cooking-oil"); 
-                get_bestbuys("butter-spreads"); 
+                get_bestbuys(); 
             }, 3000);
 
             
