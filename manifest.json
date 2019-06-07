@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Ethics in Shopping",
   "description": "Helps you make ethical shopping decisions on the Sainsburys website",
-  "version": "0.1",
+  "version": "0.2",
 
   "browser_action": {
     "default_icon": {                         
@@ -19,12 +19,14 @@
   "content_scripts": [
     {
       "matches": ["https://www.sainsburys.co.uk/*"],
-      "js": ["thirdParty/jquery-3.4.0.min.js", "thirdParty/fuzzy.min.js", "sainsburys.js"]
+      "js": ["thirdParty/jquery-3.4.0.min.js", "thirdParty/fuzzy.min.js", "sainsburys.js"],
+      "css": ["css/ethics.css"]
     }
   ],
 
   "permissions": [
     "https://www.sainsburys.co.uk/*",
-    "https://www.ethicalconsumer.org/*"
+    "https://www.ethicalconsumer.org/*",
+    "cookies"
   ]
 }

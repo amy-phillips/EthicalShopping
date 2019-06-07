@@ -13,11 +13,18 @@ function apply_colour(product_div,bestbuys,colour) {
 
             $(product_div).parent().css('background-color',colour); 
 
-            //hover over to get tooltip
-            $(product_div).parent().prop('title',bb.blurb);
-            
-
-            //console.log(bb.blurb);
+            if($(product_div).parent().find('#es-moar-infos').length==0) {
+                // add a button to link to ethical consumer site for moar infos
+                var link = document.createElement('a');
+                var linkText = document.createTextNode("More details at "+bb.link);
+                link.appendChild(linkText);
+                link.title = "For more details click here to go to the ethical consumer website";
+                link.href = bb.link;
+                link.setAttribute('target','_blank');
+                link.id='es-moar-infos'
+                $(product_div).parent().append(link);
+            }
+            //console.log(bb.link);
         }
     });
 }
@@ -59,6 +66,41 @@ function colour_page(response) {
     $('.productContainer').each( function( index, product_div ){
         colour_product(response, product_div);
     });
+
+    //little trolley at the side
+    
+    $('#trolleyTableBody').find('.product').parent().css('background-color','lightGrey'); 
+    $('#trolleyTableBody').find('.product').each( function( index, product_div ){
+        colour_product(response, product_div);
+    });
+}
+
+function display_call_to_login(subscribe_url) {
+    console.log("Need to log in to view ")
+}
+
+function display_call_to_login_if_necessary(response) {
+    subscribe_fors=[];
+    subscribe_link=null;
+    for (let value of Object.values(response)) {
+        if(value.subscribe) {
+            if(value.title) {
+                subscribe_fors.push(value.title);
+            }
+            subscribe_link=value.subscribe;
+        }
+    }
+    if(subscribe_link && $('#es-call_to_login').length==0) {
+        // add a button to link to ethical consumer site for login/subscribe
+        var linky_p = document.createElement('p');
+        linky_p.innerHTML = "Please <a href=\"https://www.ethicalconsumer.org\" target=\"_blank\">login</a> or <a href=\""+subscribe_link+"\" target=\"_blank\">subscribe</a> to Ethical Consumer so I can highlight more products for you from categories such as "+subscribe_fors.join(", ");
+        linky_p.id='es-call_to_login';
+        linky_p.className="es-login_or_subscribe-block";
+        $('#page').prepend(linky_p);
+    } else if(subscribe_link==null && $('#es-call_to_login').length>0) {
+        // remove the prompt button - they logged in!
+        $('#es-call_to_login').remove();
+    }
 }
 
 function get_bestbuys() {
@@ -70,6 +112,8 @@ function get_bestbuys() {
         } 
 
         console.log(response);
+        display_call_to_login_if_necessary(response);
+
         colour_page(response);
         return;
         
@@ -92,9 +136,10 @@ function waitForReady(){
 
             // we run our code periodically to deal with sainsburys nuking my bg colours
             //setInterval(JiraAddButtons, 5000);
+            get_bestbuys(); 
             setInterval(function(){ 
                 get_bestbuys(); 
-            }, 3000);
+            }, 30000);
 
             
             

@@ -2,18 +2,16 @@
 
 // listen for requests from unicorn.js 
 chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    console.log(request.command + (sender.tab ?
-                " from a content script:" + sender.tab.url :
-                " from the extension"));
-  if (request.command == "open_tab") {
-        openTabToUrl(request.url).then(sendResponse);
-        return true; // response will be sent async
-    } else if(request.command == "get_bestbuys") {
-        lookupGuides(sendResponse);
-        return true; // response will be sent async
+    function(request, sender, sendResponse) {
+        console.log(request.command + (sender.tab ?
+                    " from a content script:" + sender.tab.url :
+                    " from the extension"));
+        if(request.command == "get_bestbuys") {
+            lookupGuides(sendResponse);
+            return true; // response will be sent async
+        }
     }
-});
+);
 
 function openTabToUrl(_url) {
 
@@ -50,18 +48,30 @@ function onFoodReceived(foods,sendResponse) {
 
 function getBestBuys(foods, sendResponse) {
     for (let food of foods) {
-        if(gBestBuys[food] && gBestBuys[food].error==null) {
+        if(gBestBuys[food] && gBestBuys[food].error==null && gBestBuys[food].subscribe==null) {
             console.log("Sending cached data for "+food);
             console.log(gBestBuys[food]);
             onFoodReceived(foods,sendResponse); //do we have all the foods?
             continue;
         }
 
-        gBestBuys[food]=null; // clear any old errors
+        gBestBuys[food]=null; // clear any old errors or calls to subscribe etc
         $.get("https://www.ethicalconsumer.org"+food,
         function(data,status) {
             console.log(status);
             if(status=="success") {
+                // is there a call to action to subscribe?
+                var subscribe=null;
+                var sub = /<button [\.\-"=\/\<>\w\s]*?value="Sign in ">Sign in[-"=\/\<>\w\s]*?<\/button>/.exec(data);
+                if(sub) {
+                    subscribe="https://www.ethicalconsumer.org/subscribe";
+                }
+                var food_title=null;
+                var title = /<h1 class="title">\s*([\w\s\&]+?)\s*</.exec(data);
+                if(title) {
+                    food_title=title[1];
+                }
+
                 // parse out best buys - 
                 // hmm bit fragile using this regex here, but regex rather than jquery on website means we don't have to load all the dependencies of the page
                 // first grab all the <li> entries as a single string
@@ -79,14 +89,12 @@ function getBestBuys(foods, sendResponse) {
                             bb_regex.lastIndex++;
                         }
                         
-                        bestbuys.push({'title':m[1],'blurb':m[0]});
+                        bestbuys.push({'title':m[1],'link':"https://www.ethicalconsumer.org"+food});
                     }
 
                     console.log(bestbuys);
-                } else {
-                    console.error("Failed to parse bestbuys from https://www.ethicalconsumer.org"+food+" with regex - skipping");
-                }
-                
+                } 
+
                 // now parse the score table
                 var table = /<table class="table"(.*?)<\/table>/gms.exec(data);
                 const te_regex = /<h4>([^<]*)<\/h4>(?:.*?)+?<div class="score (\w+)">(?:.*?)+?/gms;
@@ -98,13 +106,13 @@ function getBestBuys(foods, sendResponse) {
                     }
 
                     var rating=m[2];
-                    table_entries[rating].push({'title':m[1],'blurb':'todo'});
+                    table_entries[rating].push({'title':m[1],'link':"https://www.ethicalconsumer.org"+food});
                 }
 
                 console.log(table_entries);
 
                 // cache results for later
-                gBestBuys[food]={'bestbuys':bestbuys,'table':table_entries};
+                gBestBuys[food]={'bestbuys':bestbuys,'table':table_entries,'subscribe':subscribe,'title':food_title};
 
                 // send them back as reply if we have all of them
                 onFoodReceived(foods,sendResponse);
