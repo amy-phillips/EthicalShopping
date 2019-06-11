@@ -172,7 +172,7 @@ function lookupGuides(sendResponse) {
                 var subscribe=null;
                 var sub = /<button [\.\-"=\/\<>\w\s]*?value="Sign in ">Sign in[-"=\/\<>\w\s]*?<\/button>/.exec(data);
                 if(sub) {
-                    subscribe="https://www.ethicalconsumer.org/subscribe";
+                    subscribe="https://www.ethicalconsumer.org/subscriptions";
                 }
                 
                 // parse out product guides
