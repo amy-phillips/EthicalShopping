@@ -1,77 +1,90 @@
 
 // todo - improve fuzzy matching
 var FUZZY_MATCH_THRESHOLD=30;
+const BAD_COLOUR='#FF8686';
+const AVG_COLOUR='#FFCE79';
+const GOOD_COLOUR='#b5ffb6';
 
-function apply_colour(product_div,bestbuys,colour) {
-    var product_name=$(product_div).text();
 
-    bestbuys.forEach(function (bb, index) {
-        //console.log( item );
-        var match = fuzzy(product_name, bb.title);
-        if(match.score > FUZZY_MATCH_THRESHOLD) {
-            //console.log(match.term + " scored "+ match.score + "because ["+match.highlightedTerm+"]");
+function apply_colour(product_div,best_match) {
+    $(product_div).parent().css('background-color',best_match.colour); 
 
-            $(product_div).parent().css('background-color',colour); 
-
-            if($(product_div).parent().find('#es-moar-infos').length==0) {
-                // add a button to link to ethical consumer site for moar infos
-                var link = document.createElement('a');
-                var linkText = document.createTextNode("More details at "+bb.link);
-                link.appendChild(linkText);
-                link.title = "For more details click here to go to the ethical consumer website";
-                link.href = bb.link;
-                link.setAttribute('target','_blank');
-                link.id='es-moar-infos'
-                $(product_div).parent().append(link);
-            }
-            //console.log(bb.link);
-        }
-    });
+    if($(product_div).parent().find('#es-moar-infos').length==0) {
+        // add a button to link to ethical consumer site for moar infos
+        var link = document.createElement('a');
+        var linkText = document.createTextNode("More details at "+best_match.bb.link);
+        link.appendChild(linkText);
+        link.title = "For more details click here to go to the ethical consumer website";
+        link.href = best_match.bb.link;
+        link.setAttribute('target','_blank');
+        link.id='es-moar-infos'
+        $(product_div).parent().append(link);
+    }
 }
 
-function colour_product(response, product_div) {
-    // is this a best buy?
+function colour_product(munged_tables, product_div) {
     $(product_div).parent().css('background-color','transparent');
+
+    // is this a best buy?
+    var product_name=$(product_div).text();
+    var best_match=null;
+    munged_tables.forEach(function (col_tbl, index) {
+        col_tbl.table.forEach(function (bb, index) {
+            //console.log( item );
+            var match = fuzzy(product_name, bb.title);
+            if(best_match==null || match.score > best_match.score) {
+                best_match=match;
+                best_match.bb=bb;
+                best_match.colour=col_tbl.colour;
+            }
+        });
+    });
+
+    //console.log(best_match.term + " scored "+ best_match.score + "because ["+best_match.highlightedTerm+"]");
+    if(best_match!=null && best_match.score>FUZZY_MATCH_THRESHOLD) {
+        apply_colour(product_div,best_match);
+    }
+}   
+
+function colour_page(response) {
+    // grab all the tables for all the product types and munge them into a big useful struct
+    munged_tables=[]
     Object.values(response.bb).forEach(value => {
         if (typeof(value.error) !== 'undefined') {
             console.log("Skipping due to error: "+value);
             return;
         }
 
-        apply_colour(product_div,value.table.bad,'#FF8686'); // light red
-        apply_colour(product_div,value.table.average,'#FFCE79'); // light orange
-        apply_colour(product_div,value.bestbuys,'#b5ffb6'); // light green
-        apply_colour(product_div,value.table.good,'#b5ffb6'); // light green
-      });
-}   
+        munged_tables.push({colour:BAD_COLOUR, table:value.table.bad});
+        munged_tables.push({colour:AVG_COLOUR, table:value.table.average});
+        munged_tables.push({colour:GOOD_COLOUR, table:value.table.good});
+        munged_tables.push({colour:GOOD_COLOUR, table:value.bestbuys});
+    });
 
-function colour_page(response) {
     // find the products
-
     // set them all grey while i think...
     // search results
     $('.productNameAndPromotions').parent().css('background-color','lightGrey'); 
     $('.productNameAndPromotions').each( function( index, product_div ){
-        colour_product(response, product_div);
+        colour_product(munged_tables, product_div);
     });
 
     //viewing single product
     $('.productTitleDescriptionContainer').parent().css('background-color','lightGrey'); 
     $('.productTitleDescriptionContainer').each( function( index, product_div ){
-        colour_product(response, product_div);
+        colour_product(munged_tables, product_div);
     });
 
     //shopping basket
     $('.productContainer').parent().css('background-color','lightGrey'); 
     $('.productContainer').each( function( index, product_div ){
-        colour_product(response, product_div);
+        colour_product(munged_tables, product_div);
     });
 
     //little trolley at the side
-    
     $('#trolleyTableBody').find('.product').parent().css('background-color','lightGrey'); 
     $('#trolleyTableBody').find('.product').each( function( index, product_div ){
-        colour_product(response, product_div);
+        colour_product(munged_tables, product_div);
     });
 }
 
