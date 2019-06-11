@@ -38,7 +38,9 @@ function openTabToUrl(_url) {
     });
 }
 
-
+function unescape(string) {
+    return new DOMParser().parseFromString(string,'text/html').querySelector('html').textContent;
+  }
 
 function onFoodReceived(foods,sendResponse) {
     // do we have all the foods, if so send the response
@@ -100,7 +102,7 @@ function getBestBuys(foods, subscribe, sendResponse) {
                 var food_title=null;
                 var title = /<h1 class="title">\s*([\w\s\&]+?)\s*</.exec(data);
                 if(title) {
-                    food_title=title[1];
+                    food_title=unescape(title[1]);
                 }
 
                 // parse out best buys - 
@@ -120,7 +122,7 @@ function getBestBuys(foods, subscribe, sendResponse) {
                             bb_regex.lastIndex++;
                         }
                         
-                        bestbuys.push({'title':m[1],'link':"https://www.ethicalconsumer.org"+food});
+                        bestbuys.push({'title':unescape(m[1]),'link':"https://www.ethicalconsumer.org"+food});
                     }
 
                     //console.log(bestbuys);
@@ -137,7 +139,7 @@ function getBestBuys(foods, subscribe, sendResponse) {
                     }
 
                     var rating=m[2];
-                    table_entries[rating].push({'title':m[1],'link':"https://www.ethicalconsumer.org"+food});
+                    table_entries[rating].push({'title':unescape(m[1]),'link':"https://www.ethicalconsumer.org"+food});
                 }
 
                 //console.log(table_entries);
