@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Ethical Shopping Helper",
-  "description": "Helps you make ethical shopping decisions on the Sainsburys website",
+  "description": "Helps you make ethical shopping decisions on the Sainsburys website based on data from Ethical Consumer Best Buy and Score Tables",
   "version": "0.3",
 
   "browser_action": {
