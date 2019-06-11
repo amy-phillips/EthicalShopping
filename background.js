@@ -1,4 +1,8 @@
+var gBestBuys={};
+var gSubscription=null;
+var gGoAwayUntil=null;
 
+const GO_AWAY_MILLIS=60*60*1000; // go away for one hour if player clicks login later
 
 // listen for requests from unicorn.js 
 chrome.runtime.onMessage.addListener(
@@ -8,6 +12,13 @@ chrome.runtime.onMessage.addListener(
                     " from the extension"));
         if(request.command == "get_bestbuys") {
             lookupGuides(sendResponse);
+            return true; // response will be sent async
+        } else if(request.command == "open_tab") {
+            openTabToUrl(request.url);
+            return true; // response will be sent async
+        } else if(request.command == "go_away") {
+            gGoAwayUntil=Date.now()+GO_AWAY_MILLIS;
+            lookupGuides(sendResponse); // do another lookup, which will not contain the links to subscribe
             return true; // response will be sent async
         }
     }
@@ -27,45 +38,65 @@ function openTabToUrl(_url) {
     });
 }
 
-var gBestBuys={};
-var gFoods=[];
+
 
 function onFoodReceived(foods,sendResponse) {
     // do we have all the foods, if so send the response
     for (let food of foods) {
         if(gBestBuys[food]) {
-            console.log("Sending cached data for "+food);
-            console.log(gBestBuys[food]);
             continue;
         }
 
-        console.log("Waiting for data for "+food);
+        //console.log("Waiting for data for "+food);
         return;
     }
 
-    sendResponse(gBestBuys);
+    // if player has aske us to leave them alone we don't send back a call to subscribe
+    // however, we cache the real value(rather than sent back value) in case they subscribe in the meantime!
+    var subscription_to_send=null;
+    if((gGoAwayUntil==null) || (Date.now()>gGoAwayUntil)) {
+        subscription_to_send=gSubscription;
+    }
+
+    console.log(gBestBuys);
+    sendResponse({"bb":gBestBuys,"subscription":subscription_to_send});
 }
 
-function getBestBuys(foods, sendResponse) {
+function getBestBuys(foods, subscribe, sendResponse) {
+    
+    var sent_request=false;
+
+    // are there any cached entries that we want to throw away?
     for (let food of foods) {
-        if(gBestBuys[food] && gBestBuys[food].error==null && gBestBuys[food].subscribe==null) {
-            console.log("Sending cached data for "+food);
-            console.log(gBestBuys[food]);
-            onFoodReceived(foods,sendResponse); //do we have all the foods?
+        if(gBestBuys[food]==null) {
+            continue;
+        }
+        if(gBestBuys[food].error) {
+            console.log("Will rerequest "+food+" because error");
+            gBestBuys[food]=null;
+            continue;
+        }
+        if(gSubscription!=subscribe) {
+            console.log("Will rerequest "+food+" because subscription check change");
+            gBestBuys[food]=null;
+            continue;
+        }
+    }
+    gSubscription=subscribe;
+            
+    for (let food of foods) {
+        if( gBestBuys[food] ) {
+            //console.log("Sending cached data for "+food);
+            //console.log(gBestBuys[food]);
             continue;
         }
 
-        gBestBuys[food]=null; // clear any old errors or calls to subscribe etc
+        sent_request=true;
         $.get("https://www.ethicalconsumer.org"+food,
         function(data,status) {
-            console.log(status);
+            //console.log(status);
             if(status=="success") {
-                // is there a call to action to subscribe?
-                var subscribe=null;
-                var sub = /<button [\.\-"=\/\<>\w\s]*?value="Sign in ">Sign in[-"=\/\<>\w\s]*?<\/button>/.exec(data);
-                if(sub) {
-                    subscribe="https://www.ethicalconsumer.org/subscribe";
-                }
+                
                 var food_title=null;
                 var title = /<h1 class="title">\s*([\w\s\&]+?)\s*</.exec(data);
                 if(title) {
@@ -76,7 +107,7 @@ function getBestBuys(foods, sendResponse) {
                 // hmm bit fragile using this regex here, but regex rather than jquery on website means we don't have to load all the dependencies of the page
                 // first grab all the <li> entries as a single string
                 var bb_ul = /<ul class="links-list links-list-noicon two-columns">(\s*(?:<li>.*?<\/li>\s*)+)<\/ul>/.exec(data);
-                console.log(bb_ul);
+                //console.log(bb_ul);
                 var bestbuys=[];
                 if(bb_ul) {
                     // then split into each entry (can I do that in regex above? - can't figure it out so KISS)
@@ -92,7 +123,7 @@ function getBestBuys(foods, sendResponse) {
                         bestbuys.push({'title':m[1],'link':"https://www.ethicalconsumer.org"+food});
                     }
 
-                    console.log(bestbuys);
+                    //console.log(bestbuys);
                 } 
 
                 // now parse the score table
@@ -109,10 +140,10 @@ function getBestBuys(foods, sendResponse) {
                     table_entries[rating].push({'title':m[1],'link':"https://www.ethicalconsumer.org"+food});
                 }
 
-                console.log(table_entries);
+                //console.log(table_entries);
 
                 // cache results for later
-                gBestBuys[food]={'bestbuys':bestbuys,'table':table_entries,'subscribe':subscribe,'title':food_title};
+                gBestBuys[food]={'bestbuys':bestbuys,'table':table_entries,'title':food_title};
 
                 // send them back as reply if we have all of them
                 onFoodReceived(foods,sendResponse);
@@ -122,22 +153,31 @@ function getBestBuys(foods, sendResponse) {
             }
         });
     }
+
+    // if we're using entirely cached data, send our response - we have all we need
+    if(!sent_request) {
+        onFoodReceived(foods,sendResponse);
+    }
 }
 
 function lookupGuides(sendResponse) {
-    if(gFoods.length > 0) {
-        console.log("Using cached data for "+gFoods);
-        getBestBuys(gFoods, sendResponse);
-    }
+    // never use cached data for the list of foods - we also use this request to check if the player is subscribed to EC 
 
     // which guides are available?
     $.get("https://www.ethicalconsumer.org/",
         function(data,status) {
             console.log(status);
             if(status=="success") {
+                // is there a call to action to subscribe?
+                var subscribe=null;
+                var sub = /<button [\.\-"=\/\<>\w\s]*?value="Sign in ">Sign in[-"=\/\<>\w\s]*?<\/button>/.exec(data);
+                if(sub) {
+                    subscribe="https://www.ethicalconsumer.org/subscribe";
+                }
+                
                 // parse out product guides
                 var pg_ul = /<a class="more" href="\/food-drink">Read more about Food &amp; Drink<\/a>.*?<h4>Product Guides<\/h4>.*?<ul>(.*?)<\/ul>/gms.exec(data);
-                console.log(pg_ul);
+                //console.log(pg_ul);
                 // then split into each entry (can I do that in regex above? - can't figure it out so KISS)
                 var m;
                 const li_regex = /<a href="([^"]+)"/gm;
@@ -151,11 +191,7 @@ function lookupGuides(sendResponse) {
                     foods.push(m[1]);
                 }
 
-                // cache for later
-                gFoods=foods;
-                console.log(gFoods);
-
-                getBestBuys(gFoods, sendResponse);
+                getBestBuys(foods, subscribe, sendResponse);
                 
             } else {
                 sendResponse({"error":status,"data":data});

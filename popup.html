@@ -6,7 +6,7 @@
  -->
 <html>
   <head>
-    <title>Ethics in Shopping</title>
+    <title>Ethical Shopping Helper</title>
 
     <!--
       - JavaScript and HTML must be in separate files: see our Content Security
@@ -16,28 +16,19 @@
      -->
      <script src="thirdParty/jquery-3.4.0.min.js" type="text/javascript"></script>
      <script src="popup.js" type="text/javascript"></script>
-
-  <style>
-  .error_message {
-    color: red;
-    font-weight: bold;
-  }
-  .success_message { color: green; font-weight: bold; }
-  
-  body {background-color: lightcyan;}
-
-  </style>
-
+     <link rel="stylesheet" type="text/css" href="css/ethics.css">
   </head>
 
   
-
+<body class="es-popup">
+<div class="es-popup-block">
   <p>
-  Ethics In Shopping is a Chrome Extension that highlights products on the Sainburys website based on their ratings from Ethical Consumer.  
-  You can try it out using the freely available ratings tables on Ethical consumer for products such as Cereal, Butter and Spreads, and Honey. 
+  Ethical Shopping Helper is a Chrome Extension that highlights products on the Sainburys website based on their ratings from Ethical Consumer.  
+  You can try it out using the freely available ratings tables on Ethical Consumer for products such as Cereal, Honey, Butter and Spreads. 
   To unlock all the ratings you will need an Ethical Consumer subscription - 
   you can <button id="loginButton" type="glowing_button">login</button> or <button id="subscribeButton" type="glowing_button">subscribe</button> 
-  at https://www.ethicalconsumer.org</p>
-  
+  at <a href="https://www.ethicalconsumer.org" id="loginLink">https://www.ethicalconsumer.org</a></p>
+</div>
+</body>
 </html>
 

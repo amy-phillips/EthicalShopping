@@ -1,15 +1,15 @@
 {
   "manifest_version": 2,
-  "name": "Ethics in Shopping",
+  "name": "Ethical Shopping Helper",
   "description": "Helps you make ethical shopping decisions on the Sainsburys website",
-  "version": "0.2",
+  "version": "0.3",
 
   "browser_action": {
     "default_icon": {                         
             "32": "images/icon32.png"           
     },
     "default_popup": "popup.html",
-    "default_title": "Ethics in Shopping"
+    "default_title": "Ethical Shopping Helper"
   },
 
   "background": {
@@ -23,6 +23,8 @@
       "css": ["css/ethics.css"]
     }
   ],
+
+  "web_accessible_resources": ["images/icon32.png"],
 
   "permissions": [
     "https://www.sainsburys.co.uk/*",

@@ -1,9 +1,12 @@
 
 
-function openCookiePage() {
+function openTabToUrl(url) {
     // grab cookie from ethical consumer for requests
-    window.open("https://www.ethicalconsumer.org", '_blank');
-    return;
+
+    chrome.runtime.sendMessage({command:"open_tab", "url":url}, function(response) {
+        console.log(response);
+        return;
+      });
 }
 
 
@@ -11,6 +14,8 @@ function openCookiePage() {
 // add javascript functionality such as onclick as we are not allowed to put this in popup.html
 document.addEventListener('DOMContentLoaded', function() {
  
-    $("#getCookieButton").click(openCookiePage);
+    $("#loginButton").click(function() {openTabToUrl("https://www.ethicalconsumer.org/");});
+    $("#loginLink").click(function() {openTabToUrl("https://www.ethicalconsumer.org/");});
+    $("#subscribeButton").click(function() {openTabToUrl("https://www.ethicalconsumer.org/subscriptions");});
 
 });
