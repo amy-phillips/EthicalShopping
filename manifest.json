@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Ethical Shopping Helper",
   "description": "Helps you make ethical shopping decisions on the Sainsburys website based on data from Ethical Consumer Best Buy and Score Tables",
-  "version": "0.4",
+  "version": "0.5",
 
   "browser_action": {
     "default_icon": {                         
@@ -13,13 +13,13 @@
   },
 
   "background": {
-     "scripts": ["thirdParty/jquery-3.4.0.min.js", "background.js"]
+     "scripts": ["thirdParty/jquery-3.4.0.min.js", "matchymcmatchypants.js", "background.js"]
   },
 
   "content_scripts": [
     {
       "matches": ["https://www.sainsburys.co.uk/*"],
-      "js": ["thirdParty/jquery-3.4.0.min.js", "thirdParty/fuzzy.min.js", "sainsburys.js"],
+      "js": ["thirdParty/jquery-3.4.0.min.js", "matchymcmatchypants.js", "sainsburys.js"],
       "css": ["css/ethics.css"]
     }
   ],

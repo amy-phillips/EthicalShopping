@@ -122,7 +122,10 @@ function getBestBuys(foods, subscribe, sendResponse) {
                             bb_regex.lastIndex++;
                         }
                         
-                        bestbuys.push({'title':unescape(m[1]),'link':"https://www.ethicalconsumer.org"+food});
+                        bestbuys.push(
+                            {'title':unescape(m[1]),
+                            'preprocessed_title':pre_process(unescape(m[1])),
+                            'link':"https://www.ethicalconsumer.org"+food+"#thumbs-up-down"});
                     }
 
                     //console.log(bestbuys);
@@ -139,7 +142,10 @@ function getBestBuys(foods, subscribe, sendResponse) {
                     }
 
                     var rating=m[2];
-                    table_entries[rating].push({'title':unescape(m[1]),'link':"https://www.ethicalconsumer.org"+food});
+                    table_entries[rating].push(
+                        {'title':unescape(m[1]),
+                        'preprocessed_title':pre_process(unescape(m[1])),
+                        'link':"https://www.ethicalconsumer.org"+food+"#score-table"});
                 }
 
                 //console.log(table_entries);

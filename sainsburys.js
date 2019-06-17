@@ -1,65 +1,60 @@
 
 // todo - improve fuzzy matching
-var FUZZY_MATCH_THRESHOLD=0.57;
+var FUZZY_MATCH_THRESHOLD=0.9;
 const BAD_COLOUR='#FF8686';
 const AVG_COLOUR='#FFCE79';
 const GOOD_COLOUR='#b5ffb6';
 const DEBUG_COLOUR='#FFFF00';
 
-const DEBUGGING=1;
-
-fuzzy.analyzeSubTerms = false; // too slow
+const DEBUGGING=0;
 
 function apply_colour(product_div,best_match) {
     $(product_div).parent().css('background-color',best_match.colour); 
 
-    if($(product_div).parent().find('#es-moar-infos').length==0) {
-        // add a button to link to ethical consumer site for moar infos
-        var link = document.createElement('a');
-        var linkText = document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
-        if(DEBUGGING) {
-            linkText = document.createTextNode("More details ("+best_match.bb.title+") ("+best_match.product_name+") ("+best_match.normalised+") at "+best_match.bb.link);
-        } 
-        link.appendChild(linkText);
-        link.title = "For more details click here to go to the ethical consumer website";
-        link.href = best_match.bb.link;
-        link.setAttribute('target','_blank');
-        link.id='es-moar-infos'
-        $(product_div).parent().append(link);
-    }
+    // add a button to link to ethical consumer site for moar infos
+    var link = document.createElement('a');
+    var linkText = document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
+    if(DEBUGGING) {
+        linkText = document.createTextNode("More details ("+best_match.bb.title+") ("+best_match.product_name+") ("+best_match.matchiness+") at "+best_match.bb.link);
+    } 
+    link.appendChild(document.createElement("br")); 
+    link.appendChild(linkText);
+    link.title = "For more details click here to go to the ethical consumer website";
+    link.href = best_match.bb.link;
+    link.setAttribute('target','_blank');
+    link.id='es-moar-infos'
+    $(product_div).parent().append(link);
 }
 
-function colour_product(munged_tables, product_div) {
+function colour_product(munged_tables, product_div, raw_product_name) {
     $(product_div).parent().css('background-color','transparent');
 
     // is this a best buy?
-    var product_name=$(product_div).text().trim();
+    
     // strip off (2 pint)
-    product_name = product_name.replace(/(?:\(?\d+ ?pint\)?$)/gmi, "");
-    product_name=product_name.trim();
+    var product_name = raw_product_name.replace(/\s*(?:\(?\d+ ?pint\)?$)/gmi, "");
+    // strip off (Sugar levy applied)
+    product_name = product_name.replace(/\s*(?:\(Sugar levy applied\)$)/gmi, "");
     // strip off 400g or 4x180ml or 3kg or x48
-    product_name = product_name.replace(/(?:\d+x)*(?:(?:\d+ml$)|(?:(?:\d+\.)?\d+l$)|(?:\d+g$)|(?:(?:\d+\.)?\d+kg$)|(?:x\d+$))/gmi, "");
+    product_name = product_name.replace(/(?:\d+\s*x)*(?:(?:\d+ml$)|(?:(?:\d+\.)?\d+l$)|(?:\d+g$)|(?:(?:\d+\.)?\d+kg$)|(?:x\d+$))/gmi, "");
     product_name=product_name.trim();
+    preprocessed_product_name=pre_process(product_name);
     var best_match=null;
-    munged_tables.forEach(function (col_tbl, index) {
-        col_tbl.table.forEach(function (bb, index) {
-            //console.log( item );
-            var match = fuzzy(product_name, bb.title);
-            // the longer the string the higher the score tends to be, so we want to normalise
-            // however shorter strings are often substrings "milka chocolate" is troublesome
-            // so divide by the lengths of both strings ???
-            match.normalised = match.score/(product_name.length + bb.title.length);
-            if(best_match==null || match.normalised > best_match.normalised) {
-                best_match=match;
+    for(let col_tbl of munged_tables) {
+        for(let bb of col_tbl.table) {
+            var matchiness = get_matchiness(preprocessed_product_name, bb.preprocessed_title);
+            if(best_match==null || matchiness > best_match.matchiness) {
+                best_match={};
+                best_match.matchiness=matchiness;
                 best_match.bb=bb;
                 best_match.colour=col_tbl.colour;
-                best_match.product_name=product_name;
+                best_match.product_name=product_name; // for debugging
             }
-        });
-    });
+        }
+    }
 
     //console.log(best_match.term + " scored "+ best_match.score + "because ["+best_match.highlightedTerm+"]");
-    if(best_match!=null && best_match.normalised>FUZZY_MATCH_THRESHOLD) {
+    if(best_match!=null && best_match.matchiness>FUZZY_MATCH_THRESHOLD) {
         apply_colour(product_div,best_match);
     } else if(DEBUGGING) {
         best_match.colour=DEBUG_COLOUR;
@@ -70,42 +65,46 @@ function colour_product(munged_tables, product_div) {
 function colour_page(response) {
     // grab all the tables for all the product types and munge them into a big useful struct
     munged_tables=[]
-    Object.values(response.bb).forEach(value => {
-        if (typeof(value.error) !== 'undefined') {
-            console.log("Skipping due to error: "+value);
-            return;
+
+    for (let prod_type in response.bb) {
+        if (!response.bb.hasOwnProperty(prod_type)) {
+            continue;
         }
 
-        munged_tables.push({colour:BAD_COLOUR, table:value.table.bad});
-        munged_tables.push({colour:AVG_COLOUR, table:value.table.average});
-        munged_tables.push({colour:GOOD_COLOUR, table:value.table.good});
-        munged_tables.push({colour:GOOD_COLOUR, table:value.bestbuys});
-    });
+        munged_tables.push({colour:BAD_COLOUR, table:response.bb[prod_type].table.bad});
+        munged_tables.push({colour:AVG_COLOUR, table:response.bb[prod_type].table.average});
+        munged_tables.push({colour:GOOD_COLOUR, table:response.bb[prod_type].table.good});
+        munged_tables.push({colour:GOOD_COLOUR, table:response.bb[prod_type].bestbuys});
+    }
 
     // find the products
-    // set them all grey while i think...
     // search results
-    $('.productNameAndPromotions').find("h3").parent().css('background-color','lightGrey'); 
     $('.productNameAndPromotions').find("h3").each( function( index, product_div ){
-        colour_product(munged_tables, product_div);
+        // has it already been coloured?
+        if($(product_div).parent().find('#es-moar-infos').length==0) {
+            colour_product(munged_tables, product_div, $(product_div).find("a").text().trim());
+        }
     });
 
     //viewing single product
-    $('.productTitleDescriptionContainer').find("h1").parent().css('background-color','lightGrey'); 
     $('.productTitleDescriptionContainer').find("h1").each( function( index, product_div ){
-        colour_product(munged_tables, product_div);
+        if($(product_div).parent().find('#es-moar-infos').length==0) {
+            colour_product(munged_tables, product_div, $(product_div).text().trim());
+        }
     });
 
     //shopping basket
-    $('.productContainer').children("a").parent().css('background-color','lightGrey'); 
     $('.productContainer').children("a").each( function( index, product_div ){
-        colour_product(munged_tables, product_div);
+        if($(product_div).parent().find('#es-moar-infos').length==0) {
+            colour_product(munged_tables, product_div, $(product_div).text().trim());
+        }
     });
 
     //little trolley at the side
-    $('#trolleyTableBody').find('.product').children("a").parent().css('background-color','lightGrey'); 
     $('#trolleyTableBody').find('.product').children("a").each( function( index, product_div ){
-        colour_product(munged_tables, product_div);
+        if($(product_div).parent().find('#es-moar-infos').length==0) {
+            colour_product(munged_tables, product_div, $(product_div).text().trim());
+        }
     });
 }
 
