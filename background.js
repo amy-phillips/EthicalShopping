@@ -1,4 +1,4 @@
-var gBestBuys={};
+var gScoreTables={};
 var gSubscription=null;
 var gGoAwayUntil=null;
 
@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(
         console.log(request.command + (sender.tab ?
                     " from a content script:" + sender.tab.url :
                     " from the extension"));
-        if(request.command == "get_bestbuys") {
+        if(request.command == "get_score_tables") {
             lookupGuides(sendResponse);
             return true; // response will be sent async
         } else if(request.command == "open_tab") {
@@ -45,7 +45,7 @@ function unescape(string) {
 function onFoodReceived(foods,sendResponse) {
     // do we have all the foods, if so send the response
     for (let food of foods) {
-        if(gBestBuys[food]) {
+        if(gScoreTables[food]) {
             continue;
         }
 
@@ -60,36 +60,36 @@ function onFoodReceived(foods,sendResponse) {
         subscription_to_send=gSubscription;
     }
 
-    console.log(gBestBuys);
-    sendResponse({"bb":gBestBuys,"subscription":subscription_to_send});
+    console.log(gScoreTables);
+    sendResponse({"scores":gScoreTables,"subscription":subscription_to_send});
 }
 
-function getBestBuys(foods, subscribe, sendResponse) {
+function getScoreTables(foods, subscribe, sendResponse) {
     
     var sent_request=false;
 
     // are there any cached entries that we want to throw away?
     for (let food of foods) {
-        if(gBestBuys[food]==null) {
+        if(gScoreTables[food]==null) {
             continue;
         }
-        if(gBestBuys[food].error) {
+        if(gScoreTables[food].error) {
             console.log("Will rerequest "+food+" because error");
-            gBestBuys[food]=null;
+            gScoreTables[food]=null;
             continue;
         }
         if(gSubscription!=subscribe) {
             console.log("Will rerequest "+food+" because subscription check change");
-            gBestBuys[food]=null;
+            gScoreTables[food]=null;
             continue;
         }
     }
     gSubscription=subscribe;
             
     for (let food of foods) {
-        if( gBestBuys[food] ) {
+        if( gScoreTables[food] ) {
             //console.log("Sending cached data for "+food);
-            //console.log(gBestBuys[food]);
+            //console.log(gScoreTables[food]);
             continue;
         }
 
@@ -105,33 +105,7 @@ function getBestBuys(foods, subscribe, sendResponse) {
                     food_title=unescape(title[1]);
                 }
 
-                // parse out best buys - 
-                // hmm bit fragile using this regex here, but regex rather than jquery on website means we don't have to load all the dependencies of the page
-                // first grab all the <li> entries as a single string
-                var bb_ul = /<ul class="links-list links-list-noicon two-columns">(\s*(?:<li>.*?<\/li>\s*)+)<\/ul>/.exec(data);
-                //console.log(bb_ul);
-                var bestbuys=[];
-                if(bb_ul) {
-                    // then split into each entry (can I do that in regex above? - can't figure it out so KISS)
-                    var m;
-                    const bb_regex = /<li>\s*<[^>]+>([^<]+)(?:<[^>]+>)*<\/li>/gm;
-                    
-                    while ((m = bb_regex.exec(bb_ul[1])) !== null) {
-                        // This is necessary to avoid infinite loops with zero-width matches
-                        if (m.index === bb_regex.lastIndex) {
-                            bb_regex.lastIndex++;
-                        }
-                        
-                        bestbuys.push(
-                            {'title':unescape(m[1]),
-                            'preprocessed_title':pre_process(unescape(m[1])),
-                            'link':"https://www.ethicalconsumer.org"+food+"#thumbs-up-down"});
-                    }
-
-                    //console.log(bestbuys);
-                } 
-
-                // now parse the score table
+                // parse the score table
                 var table = /<table class="table"(.*?)<\/table>/gms.exec(data);
                 const te_regex = /<h4>([^<]*)<\/h4>(?:.*?)+?<div class="score (\w+)">(?:.*?)+?/gms;
                 var table_entries={'good':[],'average':[],'bad':[]};
@@ -151,12 +125,12 @@ function getBestBuys(foods, subscribe, sendResponse) {
                 //console.log(table_entries);
 
                 // cache results for later
-                gBestBuys[food]={'bestbuys':bestbuys,'table':table_entries,'title':food_title};
+                gScoreTables[food]={'table':table_entries,'title':food_title};
 
                 // send them back as reply if we have all of them
                 onFoodReceived(foods,sendResponse);
             } else {
-                gBestBuys[food] = {error:status, data:data};
+                gScoreTables[food] = {error:status, data:data};
                 onFoodReceived(foods,sendResponse);
             }
         });
@@ -199,7 +173,7 @@ function lookupGuides(sendResponse) {
                     foods.push(m[1]);
                 }
 
-                getBestBuys(foods, subscribe, sendResponse);
+                getScoreTables(foods, subscribe, sendResponse);
                 
             } else {
                 sendResponse({"error":status,"data":data});

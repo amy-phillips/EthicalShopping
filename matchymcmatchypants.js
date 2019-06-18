@@ -63,7 +63,9 @@ String.prototype.plural = function(revert){
         'man'    : 'men',
         'tooth'  : 'teeth',
         'person' : 'people',
+        'bean'   : 'beanz', // for heinz
         'spread' : 'spreadable', //yes this is abusing the concept of plurality - sorry not sorry!
+        'cereal' : 'muesli',
     };
 
     var uncountable = [
@@ -81,7 +83,7 @@ String.prototype.plural = function(revert){
 
     // save some time in the case that singular and plural are the same
     if(uncountable.indexOf(this.toLowerCase()) >= 0)
-      return this;
+      return String(this);
 
     // check for irregular forms
     for(word in irregular){
