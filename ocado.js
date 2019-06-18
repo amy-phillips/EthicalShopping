@@ -10,9 +10,15 @@ function apply_colour(product_div,colour_div,best_match,link_class) {
     var img=document.createElement('img');
     img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
     img.setAttribute("alt", "Ethical Shopping Helper Logo");
-    img.setAttribute("height", "16");
+    if(link_class==null) { // no link class means we have more space so can be more verbose
+        img.setAttribute("height", "32");
+        img.setAttribute("width", "32");
+    } else {
+        img.setAttribute("height", "16");
+        img.setAttribute("width", "16");
+    }
     link.appendChild(img);
-    var linkText = document.createTextNode("More details ("+best_match.bb.title+")");
+    var linkText = document.createTextNode("("+best_match.bb.title+")");
     if(link_class==null) { // no link class means we have more space so can be more verbose
         linkText = document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
     }
