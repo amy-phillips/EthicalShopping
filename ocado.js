@@ -29,13 +29,12 @@ function apply_colour(product_div,colour_div,best_match,link_class) {
     link.title = "For more details click here to go to the ethical consumer website";
     link.href = best_match.bb.link;
     link.setAttribute('target','_blank');
+    link.addEventListener('click', (e) => { e.stopPropagation(); }, false);
     if(link_class) {
         link.className=link_class;
     }
     link.id='es-moar-infos';
-    var object_for_link_in_link=document.createElement('object');
-    object_for_link_in_link.appendChild(link);
-    $(product_div).after(object_for_link_in_link);
+    $(product_div).after(link);
 }
 
 function colour_product(munged_tables, product_div, colour_div, raw_product_name, link_class) {

@@ -64,6 +64,33 @@ function onFoodReceived(foods,sendResponse) {
     sendResponse({"scores":gScoreTables,"subscription":subscription_to_send});
 }
 
+function fixup_overly_short_titles(title) {
+    if(title=="Crunchie") {
+        return "Cadbury's Crunchie"; 
+    } else if(title=="Double Decker") {
+        return "Cadbury's Double Decker"; 
+    } else if(title=="Eclairs") {
+        return "Cadbury's Eclairs"; 
+    } else if(title=="Flake") {
+        return "Cadbury's Flake"; 
+    } else if(title=="Fudge") {
+        return "Cadbury's Fudge"; 
+    } else if(title=="Heroes") {
+        return "Cadbury's Heroes"; 
+    } else if(title=="Picnic") {
+        return "Cadbury's Picnic"; 
+    } else if(title=="Time Out") {
+        return "Cadbury's Timeout"; 
+    } else if(title=="Twirl") {
+        return "Cadbury's Twirl"; 
+    } else if(title=="Wispa") {
+        return "Cadbury's Wispa"; 
+    } else if(title=="Fab") {
+        return "Nestle Fab"; 
+    }
+    return title;
+}
+
 function getScoreTables(foods, subscribe, sendResponse) {
     
     var sent_request=false;
@@ -116,9 +143,10 @@ function getScoreTables(foods, subscribe, sendResponse) {
                     }
 
                     var rating=m[2];
+                    var title=fixup_overly_short_titles(unescape(m[1])); // flake matches too many things - hack it!
                     table_entries[rating].push(
-                        {'title':unescape(m[1]),
-                        'preprocessed_title':pre_process(unescape(m[1])),
+                        {'title':title,
+                        'preprocessed_title':pre_process(title),
                         'link':"https://www.ethicalconsumer.org"+food+"#score-table"});
                 }
 

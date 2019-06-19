@@ -131,7 +131,8 @@ function pre_process(name) {
     var plurals = name.toLowerCase().split(/\s+/);
     var singles=[];
     for(let word of plurals) {
-        singles.push(word.plural(true));
+        var single=word.plural(true);
+        if (singles.indexOf(single)==-1) singles.push(single); // no dups plz
     }
     console.log(name + " becomes:");
     console.log(singles);
