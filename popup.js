@@ -13,9 +13,9 @@ function openTabToUrl(url) {
 
 // add javascript functionality such as onclick as we are not allowed to put this in popup.html
 document.addEventListener('DOMContentLoaded', function() {
- 
-    $("#loginButton").click(function() {openTabToUrl("https://www.ethicalconsumer.org/");});
-    $("#loginLink").click(function() {openTabToUrl("https://www.ethicalconsumer.org/");});
-    $("#subscribeButton").click(function() {openTabToUrl("https://www.ethicalconsumer.org/subscriptions");});
+
+    document.querySelector("#loginButton").addEventListener("click", () => {openTabToUrl("https://www.ethicalconsumer.org/");}, false);
+    document.querySelector("#loginLink").addEventListener("click", () => {openTabToUrl("https://www.ethicalconsumer.org/");}, false);
+    document.querySelector("#subscribeButton").addEventListener("click", () => {openTabToUrl("https://www.ethicalconsumer.org/subscriptions");}, false);
 
 });
