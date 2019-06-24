@@ -119,7 +119,7 @@ async function getScoreTables(foods, subscribe, sendResponse) {
             //console.log(gScoreTables[food]);
             continue;
         }
-        
+
         sent_request=true;
 
         try {
