@@ -3,7 +3,7 @@
 
 
 function apply_colour(product_div,best_match) {
-    $(product_div).parent().css('background-color',best_match.colour); 
+    product_div.parentNode.style.backgroundColor = best_match.colour;
 
     // add a button to link to ethical consumer site for moar infos
     var link = document.createElement('a');
@@ -17,7 +17,7 @@ function apply_colour(product_div,best_match) {
     link.href = best_match.bb.link;
     link.setAttribute('target','_blank');
     link.id='es-moar-infos'
-    $(product_div).parent().append(link);
+    product_div.parentNode.appendChild(link);
 }
 
 function colour_product(munged_tables, product_div, raw_product_name) {
@@ -37,35 +37,35 @@ function colour_page(response) {
 
     // find the products
     // search results
-    $('.productNameAndPromotions').find("h3").each( function( index, product_div ){
+    document.querySelectorAll('.productNameAndPromotions h3').forEach( function( product_div ){
         // has it already been coloured?
-        if($(product_div).parent().find('#es-moar-infos').length==0) {
-            colour_product(munged_tables, product_div, $(product_div).find("a").text().trim());
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
+            colour_product(munged_tables, product_div, product_div.querySelector("a").textContent.trim());
         }
     });
 
     //viewing single product
-    $('.productTitleDescriptionContainer').find("h1").each( function( index, product_div ){
-        if($(product_div).parent().find('#es-moar-infos').length==0) {
-            colour_product(munged_tables, product_div, $(product_div).text().trim());
+    document.querySelectorAll('.productTitleDescriptionContainer h1').forEach( function( product_div ){
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
+            colour_product(munged_tables, product_div, product_div.textContent.trim());
         }
     });
 
     //shopping basket
-    $('.productContainer').children("a").each( function( index, product_div ){
-        if($(product_div).parent().find('#es-moar-infos').length==0) {
-            colour_product(munged_tables, product_div, $(product_div).text().trim());
+    document.querySelectorAll('.productContainer > a').forEach( function( product_div ){
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
+            colour_product(munged_tables, product_div, product_div.textContent.trim());
         }
     });
 
     //little trolley at the side
-    $('#trolleyTableBody').find('.product').children("a").each( function( index, product_div ){
-        if($(product_div).parent().find('#es-moar-infos').length==0) {
-            colour_product(munged_tables, product_div, $(product_div).text().trim());
+    document.querySelectorAll('#trolleyTableBody .product > a').forEach( function( product_div ){
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
+            colour_product(munged_tables, product_div, product_div.textContent.trim());
         }
     });
 }
 
 function get_header_location() {
-    return $('#globalHeaderContainer');
+    return document.querySelector('#globalHeaderContainer');
 }
