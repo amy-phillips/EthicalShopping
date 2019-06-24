@@ -154,6 +154,6 @@ window.addEventListener('load', () => {
     console.log("Ethical Shopping Helper Extension active - woot!");
 
     // we run our code periodically to check if the go_away timeout has expired, or if the player has subscribed to EC in the meantime, or data has changed
-    get_score_tables();  
+    setTimeout(get_score_tables, 2000); // Delay initial run for client side code to hopefully finish
     setInterval(get_score_tables, 30000);
 });
