@@ -7,6 +7,7 @@
     left: 0 !important;
     margin-top: 0;
     min-height: 50px !important;
+    max-height: 70px !important;
     overflow: hidden !important;
     padding: 0 !important;
     position: fixed !important;
@@ -16,6 +17,7 @@
     width: 100% !important;
     z-index: 2147483647 !important;
     max-width: "100%" !important;
+    word-break: normal !important;
 }
 
 .es-login_or_subscribe-p {
@@ -26,7 +28,16 @@
 .es-login_or_subscribe-td {
     max-width: 100% !important;
     text-align: center !important;
+    min-height: 50px !important;
+    max-height: 70px !important;
     border: 0;
+}
+
+.es-login_or_subscribe-img {
+    width: 32px !important;
+    height: 32px !important;
+    max-width: none !important;
+    max-height: none !important;
 }
 
 .es-popup {
