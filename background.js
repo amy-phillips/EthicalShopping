@@ -89,7 +89,8 @@ function fixup_overly_short_titles(title) {
         return "Nestle Fab"; 
     } else if(title=="Zingers") {
         return "James White Zingers"; 
-    }
+    } 
+
 
     if(title.indexOf(' ')<0) {
         console.log("Short title: "+title);
@@ -176,6 +177,26 @@ function getScoreTables(foods, subscribe, sendResponse) {
     }
 }
 
+function parseProductGuides(productselector,page_html) {
+    var re = new RegExp(productselector+'.*?<h4>Product Guides<\/h4>.*?<ul>(.*?)<\/ul>',"gms");
+    var pg_ul = re.exec(page_html);
+    //console.log(pg_ul);
+    // then split into each entry (can I do that in regex above? - can't figure it out so KISS)
+    var m;
+    const li_regex = /<a href="([^"]+)"/gm;
+    var foods=[];
+    while ((m = li_regex.exec(pg_ul[1])) !== null) {
+        // This is necessary to avoid infinite loops with zero-width matches
+        if (m.index === li_regex.lastIndex) {
+            li_regex.lastIndex++;
+        }
+        
+        foods.push(m[1]);
+    }
+
+    return foods;
+}
+
 function lookupGuides(sendResponse) {
     // never use cached data for the list of foods - we also use this request to check if the player is subscribed to EC 
 
@@ -191,21 +212,15 @@ function lookupGuides(sendResponse) {
                     subscribe="https://www.ethicalconsumer.org/subscriptions";
                 }
                 
-                // parse out product guides
-                var pg_ul = /<a class="more" href="\/food-drink">Read more about Food &amp; Drink<\/a>.*?<h4>Product Guides<\/h4>.*?<ul>(.*?)<\/ul>/gms.exec(data);
-                //console.log(pg_ul);
-                // then split into each entry (can I do that in regex above? - can't figure it out so KISS)
-                var m;
-                const li_regex = /<a href="([^"]+)"/gm;
                 var foods=[];
-                while ((m = li_regex.exec(pg_ul[1])) !== null) {
-                    // This is necessary to avoid infinite loops with zero-width matches
-                    if (m.index === li_regex.lastIndex) {
-                        li_regex.lastIndex++;
-                    }
-                    
-                    foods.push(m[1]);
-                }
+                // parse out product guides - food and drink
+                foods=foods.concat(parseProductGuides('<a class="more" href="\/food-drink">Read more about Food &amp; Drink<\/a>',data));
+                //health and beauty
+                foods=foods.concat(parseProductGuides('<a class="more" href="/health-beauty">Read more about Health &amp; Beauty</a>',data));
+
+                // strip out perfume shops because it has short names and doesn;t help
+                var index = foods.indexOf('/health-beauty/shopping-guide/perfume-shops');
+                if (index !== -1) foods.splice(index, 1);
 
                 getScoreTables(foods, subscribe, sendResponse);
                 
