@@ -7,11 +7,17 @@ function apply_colour(product_div,best_match) {
 
     // add a button to link to ethical consumer site for moar infos
     var link = document.createElement('a');
+    link.appendChild(document.createElement("br")); 
+    var img=document.createElement('img');
+    img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
+    img.setAttribute("alt", "Ethical Shopping Helper Logo");
+    img.setAttribute("height", "16");
+    img.setAttribute("width", "16");
+    link.appendChild(img);
     var linkText = document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
     if(DEBUGGING) {
         linkText = document.createTextNode("More details ("+best_match.bb.title+") ("+best_match.product_name+") ("+best_match.matchiness+") at "+best_match.bb.link);
     } 
-    link.appendChild(document.createElement("br")); 
     link.appendChild(linkText);
     link.title = "For more details click here to go to the ethical consumer website";
     link.href = best_match.bb.link;

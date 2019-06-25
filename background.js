@@ -87,6 +87,12 @@ function fixup_overly_short_titles(title) {
         return "Cadbury's Wispa"; 
     } else if(title=="Fab") {
         return "Nestle Fab"; 
+    } else if(title=="Zingers") {
+        return "James White Zingers"; 
+    }
+
+    if(title.indexOf(' ')<0) {
+        console.log("Short title: "+title);
     }
     return title;
 }

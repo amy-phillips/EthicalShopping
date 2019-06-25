@@ -134,8 +134,8 @@ function pre_process(name) {
         var single=word.plural(true);
         if (singles.indexOf(single)==-1) singles.push(single); // no dups plz
     }
-    console.log(name + " becomes:");
-    console.log(singles);
+    //console.log(name + " becomes:");
+    //console.log(singles);
     return {"name":name,"words":singles};
 }
 

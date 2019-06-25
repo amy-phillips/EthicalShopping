@@ -148,31 +148,34 @@ function go_away() {
       });
 }
 
-function waitForReady(){
-    console.log("waiting...");
-    // ensure document readystate is complete before messing with colours
-    if( document.readyState !== 'complete'){
-        setTimeout(function(){
-            waitForReady();
-        }, 10 );
-    }
-    else {
-        // wait for the iframe to load
-        $("iframe").ready(function (){
-            console.log("Ethical Shopping Helper Extension active - woot!");
-
-            // we run our code periodically to check if the go_away timeout has expired, or if the player has subscribed to EC in the meantime, or data has changed
-            get_score_tables(); 
-            setInterval(function(){ 
-                get_score_tables(); 
-            }, 30000);
-
-            
-            
-        });
-    }
-
+// this fires when the dom content is loaded (no css or images) - 
+// fire off a request to the background page for the tables and try to highlight stuff 
+// (may get overwritten as css is loaded for host page)
+if (document.readyState == 'loading') {
+    // loading yet, wait for the event
+    document.addEventListener("DOMContentLoaded", function(){
+        console.log("Ethical Shopping Helper Extension prefetching - woot!");
+        get_score_tables(); 
+    });
+} else {
+    // DOM is ready!
+    console.log("Ethical Shopping Helper Extension prefetching - woot!");
+    get_score_tables(); 
 }
 
 
-waitForReady();
+// this fires when everything is loaded - let's highlight again
+window.addEventListener("load", function(){
+    // wait 2s for sainsburys scripts to run - urgh sorry!
+    setTimeout(function()
+    {
+        console.log("Ethical Shopping Helper Extension highlighting");
+        get_score_tables(); 
+
+        // we run our code periodically to check if the go_away timeout has expired, or if the player has subscribed to EC in the meantime, or data has changed
+        setInterval(function(){ 
+            get_score_tables(); 
+        }, 30000);
+    }, 2000);
+});
+
