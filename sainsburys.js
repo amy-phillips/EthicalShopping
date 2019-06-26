@@ -22,7 +22,7 @@ function apply_colour(product_div,best_match) {
     link.title = "For more details click here to go to the ethical consumer website";
     link.href = best_match.bb.link;
     link.setAttribute('target','_blank');
-    link.id='es-moar-infos'
+    link.id='es-moar-infos';
     product_div.parentNode.appendChild(link);
 }
 

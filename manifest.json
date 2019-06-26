@@ -29,7 +29,7 @@
     },
     {
       "matches": ["https://www.tesco.com/groceries/*"],
-      "js": ["thirdParty/jquery-3.4.0.min.js", "matchymcmatchypants.js", "common.js", "tesco.js"],
+      "js": ["matchymcmatchypants.js", "common.js", "tesco.js"],
       "css": ["css/ethics.css"]
     }
   ],
