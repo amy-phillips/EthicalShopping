@@ -98,7 +98,7 @@ function fixup_overly_short_titles(title) {
     return title;
 }
 
-function getScoreTables(foods, subscribe, sendResponse) {
+async function getScoreTables(foods, subscribe, sendResponse) {
     
     var sent_request=false;
 
@@ -128,47 +128,49 @@ function getScoreTables(foods, subscribe, sendResponse) {
         }
 
         sent_request=true;
-        $.get("https://www.ethicalconsumer.org"+food,
-        function(data,status) {
-            //console.log(status);
-            if(status=="success") {
+
+        try {
+            const response = await fetch(`https://www.ethicalconsumer.org${food}`);
+
+            if (!response.ok) throw new Error(response.statusText);
+
+            const data = await response.text();
                 
-                var food_title=null;
-                var title = /<h1 class="title">\s*([\w\s\&]+?)\s*</.exec(data);
-                if(title) {
-                    food_title=unescape(title[1]);
-                }
-
-                // parse the score table
-                var table = /<table class="table"(.*?)<\/table>/gms.exec(data);
-                const te_regex = /<h4>([^<]*)<\/h4>(?:.*?)+?<div class="score (\w+)">(?:.*?)+?/gms;
-                var table_entries={'good':[],'average':[],'bad':[]};
-                while ((m = te_regex.exec(table[1])) !== null) {
-                    // This is necessary to avoid infinite loops with zero-width matches
-                    if (m.index === te_regex.lastIndex) {
-                        te_regex.lastIndex++;
-                    }
-
-                    var rating=m[2];
-                    var title=fixup_overly_short_titles(unescape(m[1])); // flake matches too many things - hack it!
-                    table_entries[rating].push(
-                        {'title':title,
-                        'preprocessed_title':pre_process(title),
-                        'link':"https://www.ethicalconsumer.org"+food+"#score-table"});
-                }
-
-                //console.log(table_entries);
-
-                // cache results for later
-                gScoreTables[food]={'table':table_entries,'title':food_title};
-
-                // send them back as reply if we have all of them
-                onFoodReceived(foods,sendResponse);
-            } else {
-                gScoreTables[food] = {error:status, data:data};
-                onFoodReceived(foods,sendResponse);
+            var food_title=null;
+            var title = /<h1 class="title">\s*([\w\s\&]+?)\s*</.exec(data);
+            if(title) {
+                food_title=unescape(title[1]);
             }
-        });
+
+            // parse the score table
+            var table = /<table class="table"(.*?)<\/table>/gms.exec(data);
+            const te_regex = /<h4>([^<]*)<\/h4>(?:.*?)+?<div class="score (\w+)">(?:.*?)+?/gms;
+            var table_entries={'good':[],'average':[],'bad':[]};
+            while ((m = te_regex.exec(table[1])) !== null) {
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (m.index === te_regex.lastIndex) {
+                    te_regex.lastIndex++;
+                }
+
+                var rating=m[2];
+                var title=fixup_overly_short_titles(unescape(m[1])); // flake matches too many things - hack it!
+                table_entries[rating].push(
+                    {'title':title,
+                    'preprocessed_title':pre_process(title),
+                    'link':"https://www.ethicalconsumer.org"+food+"#score-table"});
+            }
+
+            //console.log(table_entries);
+
+            // cache results for later
+            gScoreTables[food]={'table':table_entries,'title':food_title};
+
+            // send them back as reply if we have all of them
+            onFoodReceived(foods,sendResponse);
+        } catch (error) {
+            gScoreTables[food] = { error, data: {} };
+            onFoodReceived(foods,sendResponse);
+        }
     }
 
     // if we're using entirely cached data, send our response - we have all we need
@@ -197,43 +199,45 @@ function parseProductGuides(productselector,page_html) {
     return foods;
 }
 
-function lookupGuides(sendResponse) {
+async function lookupGuides(sendResponse) {
     // never use cached data for the list of foods - we also use this request to check if the player is subscribed to EC 
 
     // which guides are available?
-    $.get("https://www.ethicalconsumer.org/",
-        function(data,status) {
-            console.log(status);
-            if(status=="success") {
-                // is there a call to action to subscribe?
-                var subscribe=null;
-                var sub = /<button [\.\-"=\/\<>\w\s]*?value="Sign in ">Sign in[-"=\/\<>\w\s]*?<\/button>/.exec(data);
-                if(sub) {
-                    subscribe="https://www.ethicalconsumer.org/subscriptions";
-                }
-                
-                var foods=[];
-                // parse out product guides - food and drink
-                foods=foods.concat(parseProductGuides('<a class="more" href="\/food-drink">Read more about Food &amp; Drink<\/a>',data));
-                //health and beauty
-                foods=foods.concat(parseProductGuides('<a class="more" href="/health-beauty">Read more about Health &amp; Beauty</a>',data));
+    try {
+        const response = await fetch("https://www.ethicalconsumer.org/");
 
-                // some more products that are stocked by supermarkets - don;t want all of home and garden tho
-                foods.push('/home-garden/shopping-guide/dishwasher-detergent');
-                foods.push('/home-garden/shopping-guide/household-cleaners');
-                foods.push('/home-garden/shopping-guide/laundry-detergents');
-                foods.push('/home-garden/shopping-guide/toilet-cleaners');
-                foods.push('/home-garden/shopping-guide/toilet-paper');
-                foods.push('/home-garden/shopping-guide/washing-liquid');
+        if (!response.ok) throw new Error(response.statusText);
 
-                // strip out perfume shops because it has short names and doesn;t help
-                var index = foods.indexOf('/health-beauty/shopping-guide/perfume-shops');
-                if (index !== -1) foods.splice(index, 1);
+        const data = await response.text();
 
-                getScoreTables(foods, subscribe, sendResponse);
-                
-            } else {
-                sendResponse({"error":status,"data":data});
-            }
-        });
+        // is there a call to action to subscribe?
+        var subscribe=null;
+        var sub = /<button [\.\-"=\/\<>\w\s]*?value="Sign in ">Sign in[-"=\/\<>\w\s]*?<\/button>/.exec(data);
+        if(sub) {
+            subscribe="https://www.ethicalconsumer.org/subscriptions";
+        }
+        
+        var foods=[];
+        // parse out product guides - food and drink
+        foods=foods.concat(parseProductGuides('<a class="more" href="\/food-drink">Read more about Food &amp; Drink<\/a>',data));
+        //health and beauty
+        foods=foods.concat(parseProductGuides('<a class="more" href="/health-beauty">Read more about Health &amp; Beauty</a>',data));
+
+        // some more products that are stocked by supermarkets - don;t want all of home and garden tho
+        foods.push('/home-garden/shopping-guide/dishwasher-detergent');
+        foods.push('/home-garden/shopping-guide/household-cleaners');
+        foods.push('/home-garden/shopping-guide/laundry-detergents');
+        foods.push('/home-garden/shopping-guide/toilet-cleaners');
+        foods.push('/home-garden/shopping-guide/toilet-paper');
+        foods.push('/home-garden/shopping-guide/washing-liquid');
+
+        // strip out perfume shops because it has short names and doesn;t help
+        var index = foods.indexOf('/health-beauty/shopping-guide/perfume-shops');
+        if (index !== -1) foods.splice(index, 1);
+
+        getScoreTables(foods, subscribe, sendResponse);                
+    }
+    catch (error) {
+        sendResponse({ error, data: {} });
+    }
 }

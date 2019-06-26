@@ -3,7 +3,7 @@
 
 
 function apply_colour(product_div,colour_div,best_match,link_class) {
-    $(colour_div).css('background-color',best_match.colour); 
+    colour_div.style.backgroundColor = best_match.colour; 
 
     // add a button to link to ethical consumer site for moar infos
     var link = document.createElement('a');
@@ -34,7 +34,7 @@ function apply_colour(product_div,colour_div,best_match,link_class) {
         link.className=link_class;
     }
     link.id='es-moar-infos';
-    $(product_div).after(link);
+    product_div.after(link);
 }
 
 function colour_product(munged_tables, product_div, colour_div, raw_product_name, link_class) {
@@ -49,16 +49,23 @@ function colour_product(munged_tables, product_div, colour_div, raw_product_name
 }   
 
 function ocado_get_product_name(product_div) {
+    let el;
+    let title;
+
     // first deal with truncated titles as too long:
-    if($(product_div).find('abbr').length && $(product_div).find('abbr').attr('title')) {
-        return $(product_div).find('abbr').attr('title');
-    } 
-    if($(product_div).attr('title')) {
-        return $(product_div).attr('title'); // search results abbreviated title
-    }
-    if($(product_div).find('a').length && $(product_div).find('a').attr('title')) {
-        return $(product_div).find('a').attr('title'); // rhs abbreviated title
-    }
+    el = product_div.querySelector('abbr');
+    title = el ? el.getAttribute('title') : null;
+
+    if (title) return title;
+
+    title = product_div.getAttribute('title');
+    
+    if (title) return title;  // search results abbreviated title
+
+    el = product_div.querySelector('a');
+    title = el ? el.getAttribute('title') : null;
+
+    if (title) return title; // rhs abbreviated title
 
     // don;t need these ones because the strong code covers them
     //if($(product_div).find("[itemprop=name]").length) {
@@ -66,11 +73,11 @@ function ocado_get_product_name(product_div) {
     //} 
     
     // grab the bold bit (to avoid things like Waitrose Celeriac Typically 350g)
-    if($(product_div).find("strong").length) {
-        return $(product_div).find("strong").text().trim();
-    } 
+    el = product_div.querySelector('strong');
 
-    return $(product_div).text().trim();
+    if (el) return el.textContent.trim();
+
+    return product_div.textContent.trim();
 }
 
 function colour_page(response) {
@@ -82,27 +89,27 @@ function colour_page(response) {
     
     // find the products
     // search results
-    $('.fop-title').each( function( index, product_div ){
+    document.querySelectorAll('.fop-title').forEach( function( product_div ){
         // has it already been coloured?
-        if($(product_div).parent().find('#es-moar-infos').length==0) {
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var title=ocado_get_product_name(product_div);
-            colour_product(munged_tables, product_div, $(product_div).parent().parent().parent().parent(), title, 'es-ocado-search-result');
+            colour_product(munged_tables, product_div, product_div.parentNode.parentNode.parentNode.parentNode, title, 'es-ocado-search-result');
         }
     });
 
     //viewing single product
-    $('.productTitle').each( function( index, product_div ){
-        if($(product_div).parent().find('#es-moar-infos').length==0) {
+    document.querySelectorAll('.productTitle').forEach( function( product_div ){
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var title=ocado_get_product_name(product_div);
-            colour_product(munged_tables, product_div, $(product_div).parent().parent(), title);
+            colour_product(munged_tables, product_div, product_div.parentNode.parentNode, title);
         }
     });
 
     //shopping basket
-    $('.trolleyTextTitle').each( function( index, product_div ){
-        if($(product_div).parent().find('#es-moar-infos').length==0) {
+    document.querySelectorAll('.trolleyTextTitle').forEach( function( product_div ){
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var title=ocado_get_product_name(product_div);
-            colour_product(munged_tables, product_div, $(product_div).parent(), title);
+            colour_product(munged_tables, product_div, product_div.parentNode, title);
         }
     });
 
@@ -116,13 +123,18 @@ function colour_page(response) {
 }
 
 function get_header_location() {
+    const mainContent = document.querySelector('#main-content');
+
     // viewing search results
-    if($('#main-content').length) {
-        return $('#main-content');
+    if(mainContent) {
+        return mainContent;
     }
+
+    const header = document.querySelector('#header');
+
     // viewing one product
-    if($('#header').length) {
-        return $('#header');
+    if(header) {
+        return header;
     }
-    return $('body');
+    return document.querySelector('body');
 }

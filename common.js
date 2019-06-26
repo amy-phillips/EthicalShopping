@@ -65,7 +65,9 @@ function display_call_to_login_if_necessary(response) {
         }
     }
     
-    if(subscribe_link && $('#es-call_to_login').length==0) {
+    const esCallToLogin = document.querySelector("#es-call_to_login");
+
+    if(subscribe_link && !esCallToLogin) {
         // add a button to link to ethical consumer site for login/subscribe
         var top_bar=document.createElement('table');
         top_bar.className="es-login_or_subscribe-block";
@@ -107,9 +109,9 @@ function display_call_to_login_if_necessary(response) {
         cell3.appendChild(goaway_linky);
 
         get_header_location().append(top_bar); // put it on end of body, but css positions it at top of page
-    } else if(subscribe_link==null && $('#es-call_to_login').length>0) {
+    } else if(subscribe_link==null && esCallToLogin) {
         // remove the prompt button - they logged in!
-        $('#es-call_to_login').remove();
+        esCallToLogin.parentNode.removeChild(esCallToLogin);
     }
 }
 
@@ -149,34 +151,10 @@ function go_away() {
       });
 }
 
-// this fires when the dom content is loaded (no css or images) - 
-// fire off a request to the background page for the tables and try to highlight stuff 
-// (may get overwritten as css is loaded for host page)
-if (document.readyState == 'loading') {
-    // loading yet, wait for the event
-    document.addEventListener("DOMContentLoaded", function(){
-        console.log("Ethical Shopping Helper Extension prefetching - woot!");
-        get_score_tables(); 
-    });
-} else {
-    // DOM is ready!
-    console.log("Ethical Shopping Helper Extension prefetching - woot!");
-    get_score_tables(); 
-}
+window.addEventListener('load', () => {
+    console.log("Ethical Shopping Helper Extension active - woot!");
 
-
-// this fires when everything is loaded - let's highlight again
-window.addEventListener("load", function(){
-    // wait 2s for sainsburys scripts to run - urgh sorry!
-    setTimeout(function()
-    {
-        console.log("Ethical Shopping Helper Extension highlighting");
-        get_score_tables(); 
-
-        // we run our code periodically to check if the go_away timeout has expired, or if the player has subscribed to EC in the meantime, or data has changed
-        setInterval(function(){ 
-            get_score_tables(); 
-        }, 30000);
-    }, 2000);
+    // we run our code periodically to check if the go_away timeout has expired, or if the player has subscribed to EC in the meantime, or data has changed
+    setTimeout(get_score_tables, 2000); // Delay initial run for client side code to hopefully finish
+    setInterval(get_score_tables, 30000);
 });
-
