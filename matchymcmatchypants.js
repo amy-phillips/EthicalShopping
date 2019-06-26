@@ -122,9 +122,15 @@ function pre_process(name) {
     name=name.replace(ETHICAL_CONSUMER_MARKUP,'');
     // remove accented characters https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
     name=name.normalize('NFD');
+    name=name.replace('-',' '); //washing-up should become washing up, rather than washingup
     name=name.replace(PUNCTUATION,'');
     name=name.replace('tinned','');
     name=name.replace('MSC','');
+    //ethical consumer is all american with their laundry detergent
+    name=name.replace(/washing (powder|gel|liquid|capsules)/gi,'laundry detergent');
+    name=name.replace(/laundry liquid/gi,'laundry detergent');
+    name=name.replace(/washing powder and liquid/gi,'laundry detergent');
+    name=name.replace(/dishwasher (powder|tablets)/gi,'dishwasher detergent');
     name=name.trim();
    
     // split into words, make all lowercase, and not plural
@@ -134,8 +140,8 @@ function pre_process(name) {
         var single=word.plural(true);
         if (singles.indexOf(single)==-1) singles.push(single); // no dups plz
     }
-    console.log(name + " becomes:");
-    console.log(singles);
+    //console.log(name + " becomes:");
+    //console.log(singles);
     return {"name":name,"words":singles};
 }
 

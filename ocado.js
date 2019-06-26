@@ -84,6 +84,9 @@ function colour_page(response) {
     // grab all the tables for all the product types and munge them into a big useful struct
     munged_tables=get_munged_tables(response);
 
+
+    // todo try `document.querySelector` and `document.querySelectorAll`
+    
     // find the products
     // search results
     document.querySelectorAll('.fop-title').forEach( function( product_div ){

@@ -82,6 +82,7 @@ function display_call_to_login_if_necessary(response) {
         var img=document.createElement('img');
         img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
         img.setAttribute("alt", "Ethical Shopping Helper Logo");
+        img.className = "es-login_or_subscribe-img"
         cell1.appendChild(img);
         cell1.className = "es-login_or_subscribe-td";
 
