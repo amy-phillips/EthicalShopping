@@ -18,6 +18,7 @@
     z-index: 2147483647 !important;
     max-width: "100%" !important;
     word-break: normal !important;
+    border-spacing: 15px !important;
 }
 
 .es-login_or_subscribe-p {
@@ -56,3 +57,20 @@
     line-height: 0;
     display: block;
 }
+
+.es-tesco-mini-trolley {
+    font-size: x-small;
+    line-height: 1em;
+    font-weight: normal;
+}
+
+.es-tesco-search-result {
+    font-size: small;
+    font-weight: normal;
+}
+
+.es-tesco-single-product {
+    font-size: medium;
+    font-weight: normal;
+}
+

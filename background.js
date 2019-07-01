@@ -137,9 +137,11 @@ async function getScoreTables(foods, subscribe, sendResponse) {
             const data = await response.text();
                 
             var food_title=null;
-            var title = /<h1 class="title">\s*([\w\s\&]+?)\s*</.exec(data);
+            var title = /<h1 class="title">\s*([\w\s&;,-]+?)[\s]*</.exec(data);
             if(title) {
                 food_title=unescape(title[1]);
+            } else{
+                console.log(`Failed to parse title for ${food}`);
             }
 
             // parse the score table

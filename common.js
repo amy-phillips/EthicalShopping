@@ -151,10 +151,28 @@ function go_away() {
       });
 }
 
+// if you search on ocado or tesco it changes the url without a reload
+var gLastURL;
+function check_for_searches() {
+    var url=document.URL;
+    if(url===gLastURL)
+        return;
+
+    gLastURL=url;
+    console.log("Search detected - will refresh formatting in 4s");
+    setTimeout(get_score_tables, 4000);
+}
+
 window.addEventListener('load', () => {
     console.log("Ethical Shopping Helper Extension active - woot!");
 
     // we run our code periodically to check if the go_away timeout has expired, or if the player has subscribed to EC in the meantime, or data has changed
     setTimeout(get_score_tables, 2000); // Delay initial run for client side code to hopefully finish
     setInterval(get_score_tables, 30000);
+
+    // tesco and ocado change the url when you search, but don't reload the entire page - so catch this and trigger a recolouring
+    // window.addEventListener('hashchange',..) wasn't working so let's just brute force check the url every second
+    setInterval(check_for_searches, 1000);
 });
+
+
