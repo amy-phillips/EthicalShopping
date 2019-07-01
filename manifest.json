@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Ethical Shopping Helper",
-  "description": "Helps you make ethical shopping decisions on the Sainsburys/Ocado website based on data from Ethical Consumer Score Tables",
-  "version": "0.6",
+  "description": "Helps you make ethical shopping decisions on the Sainsburys/Tesco/Ocado website based on data from Ethical Consumer Score Tables",
+  "version": "0.7",
 
   "browser_action": {
     "default_icon": {                         
