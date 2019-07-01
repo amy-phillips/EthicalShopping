@@ -1,6 +1,8 @@
 
 
-
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
 
 function apply_colour(product_div,colour_div,css_class,best_match) {
     colour_div.style.backgroundColor = best_match.colour;
@@ -13,9 +15,9 @@ function apply_colour(product_div,colour_div,css_class,best_match) {
     img.setAttribute("alt", "Ethical Shopping Helper Logo");
     img.className="es-img-16";
     link.appendChild(img);
-    var linkText = document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
-    if(css_class=="es-tesco-mini-trolley") { // very small space on mini trolley
-        linkText = document.createTextNode("("+best_match.bb.title+")");
+    var linkText = document.createTextNode("("+best_match.bb.title+")"); // very small space on asda site!
+    if(css_class=="asda-single-product") {
+        document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
     }
     if(DEBUGGING) {
         linkText = document.createTextNode("More details ("+best_match.bb.title+") ("+best_match.product_name+") ("+best_match.matchiness+") at "+best_match.bb.link);
@@ -27,7 +29,13 @@ function apply_colour(product_div,colour_div,css_class,best_match) {
     link.addEventListener('click', (e) => { e.stopPropagation(); }, false);
     link.id='es-moar-infos';
     link.className=css_class;
-    product_div.parentNode.appendChild(link);
+
+    product_div.appendChild(link);
+
+    //var div=document.createElement('div');
+    //div.appendChild(link);
+
+    //insertAfter(div, product_div);
 }
 
 function colour_product(munged_tables, product_div, colour_div, css_class, raw_product_name) {
@@ -47,37 +55,35 @@ function colour_page(response) {
 
     // find the products
     // search results
-    // and shopping basket big view
-    document.querySelectorAll('.product-tile--title').forEach( function( product_div ){
+    // and shopping basket small
+    document.querySelectorAll('.productTitle').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
-            // want to colour in the tile-content box
+            // want to colour in the item or product
             var tile_content=product_div.parentNode;
-            while(tile_content && !tile_content.classList.contains("tile-content")) {
+            while(tile_content && !tile_content.classList.contains("item") && !tile_content.classList.contains("product")) {
                 tile_content=tile_content.parentNode;
             }
-            if(!tile_content) {
+            var css_class="es-asda-search-result";
+            if(tile_content) {
+                if(tile_content.classList.contains("item")) {
+                    css_class="es-asda-mini-trolley";
+                }
+            } else {
                 console.log("Error: failed to find tile_content node for "+product_div.textContent.trim());
                 tile_content=product_div.parentNode;
             }
-            colour_product(munged_tables, product_div, tile_content, "es-tesco-search-result", product_div.textContent.trim());
+            colour_product(munged_tables, product_div, tile_content, css_class, product_div.textContent.trim());
         }
     });
 
     //viewing single product
-    document.querySelectorAll('.product-details-tile__title').forEach( function( product_div ){
+    document.querySelectorAll('.prod-title').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
-            colour_product(munged_tables, product_div, product_div.parentNode.parentNode, "es-tesco-single-product", product_div.textContent.trim());
-        }
-    });
-
-    //little trolley at the side
-    document.querySelectorAll('.mini-tile__title-wrapper').forEach( function( product_div ){
-        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
-            colour_product(munged_tables, product_div, product_div.parentNode.parentNode.parentNode, "es-tesco-mini-trolley",product_div.textContent.trim());
+            colour_product(munged_tables, product_div, product_div.parentNode, "es-asda-single-product", product_div.textContent.trim());
         }
     });
 }
 
 function get_header_location() {
-    return document.querySelector('.header-wrapper');
+    return document.querySelector('#pageHeaderContainer');
 }

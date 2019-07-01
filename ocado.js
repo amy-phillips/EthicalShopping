@@ -11,11 +11,9 @@ function apply_colour(product_div,colour_div,best_match,link_class) {
     img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
     img.setAttribute("alt", "Ethical Shopping Helper Logo");
     if(link_class==null) { // no link class means we have more space so can be more verbose
-        img.setAttribute("height", "32");
-        img.setAttribute("width", "32");
+        img.className="es-img-32";
     } else {
-        img.setAttribute("height", "16");
-        img.setAttribute("width", "16");
+        img.className="es-img-16";
     }
     link.appendChild(img);
     var linkText = document.createTextNode("("+best_match.bb.title+")");

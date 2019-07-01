@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Ethical Shopping Helper",
-  "description": "Helps you make ethical shopping decisions on the Sainsburys/Tesco/Ocado website based on data from Ethical Consumer Score Tables",
-  "version": "0.7",
+  "description": "Helps you make ethical shopping decisions on the Sainsburys/Tesco/Asda/Ocado websites based on data from Ethical Consumer Score Tables",
+  "version": "0.8",
 
   "browser_action": {
     "default_icon": {                         
@@ -30,6 +30,11 @@
     {
       "matches": ["https://www.tesco.com/groceries/*"],
       "js": ["matchymcmatchypants.js", "common.js", "tesco.js"],
+      "css": ["css/ethics.css"]
+    },
+    {
+      "matches": ["https://groceries.asda.com/*"],
+      "js": ["matchymcmatchypants.js", "common.js", "asda.js"],
       "css": ["css/ethics.css"]
     }
   ],

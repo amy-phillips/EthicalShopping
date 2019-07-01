@@ -82,7 +82,7 @@ function display_call_to_login_if_necessary(response) {
         var img=document.createElement('img');
         img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
         img.setAttribute("alt", "Ethical Shopping Helper Logo");
-        img.className = "es-login_or_subscribe-img"
+        img.className = "es-img-32"
         cell1.appendChild(img);
         cell1.className = "es-login_or_subscribe-td";
 
@@ -94,7 +94,7 @@ function display_call_to_login_if_necessary(response) {
         var linky_p = document.createElement('p');
         var last=subscribe_fors.pop();
         var subscr_fors_str=subscribe_fors.join(", ")+" and "+last;
-        linky_p.innerHTML = "Please <a href=\"https://www.ethicalconsumer.org\" target=\"_blank\">login</a> or <a href=\""+subscribe_link+"\" target=\"_blank\">subscribe</a> to Ethical Consumer so I can highlight more products for you from categories such as "+subscr_fors_str;
+        linky_p.innerHTML = "Please <a href=\"https://www.ethicalconsumer.org\" target=\"_blank\">sign in</a> or <a href=\""+subscribe_link+"\" target=\"_blank\">subscribe</a> to Ethical Consumer so I can highlight more products for you from categories such as "+subscr_fors_str;
         linky_p.className = "es-login_or_subscribe-p";
         cell2.appendChild(linky_p);
 
@@ -165,13 +165,14 @@ function check_for_searches() {
 
 window.addEventListener('load', () => {
     console.log("Ethical Shopping Helper Extension active - woot!");
-
+    
     // we run our code periodically to check if the go_away timeout has expired, or if the player has subscribed to EC in the meantime, or data has changed
     setTimeout(get_score_tables, 2000); // Delay initial run for client side code to hopefully finish
     setInterval(get_score_tables, 30000);
 
     // tesco and ocado change the url when you search, but don't reload the entire page - so catch this and trigger a recolouring
     // window.addEventListener('hashchange',..) wasn't working so let's just brute force check the url every second
+    gLastURL=document.URL;
     setInterval(check_for_searches, 1000);
 });
 

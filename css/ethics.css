@@ -34,11 +34,22 @@
     border: 0;
 }
 
-.es-login_or_subscribe-img {
+.es-img-32 {
     width: 32px !important;
     height: 32px !important;
     max-width: none !important;
     max-height: none !important;
+    float: left !important;
+    position:static !important;
+}
+
+.es-img-16 {
+    width: 16px !important;
+    height: 16px !important;
+    max-width: none !important;
+    max-height: none !important;
+    float: left !important;
+    position:static !important;
 }
 
 .es-popup {
@@ -49,6 +60,32 @@
 .es-popup-block {
     margin: 5px;
     margin-right: 10px;
+}
+
+.es-sainsbury-search-result {
+    font-size: x-small;
+    font-weight: normal;
+    display: block !important;
+    text-align: center !important;
+}
+
+.es-sainsbury-single-product {
+    font-size: x-small;
+    font-weight: normal;
+    display: block !important;
+}
+
+.es-sainsbury-shopping-basket {
+    font-size: x-small;
+    font-weight: normal;
+    display: block !important;
+}
+
+.es-sainsbury-mini-trolley {
+    font-size: x-small;
+    line-height: 1em;
+    font-weight: normal;
+    display: block !important;
 }
 
 .es-ocado-search-result {
@@ -72,5 +109,31 @@
 .es-tesco-single-product {
     font-size: medium;
     font-weight: normal;
+}
+
+.es-asda-search-result {
+    font-size: x-small;
+    font-weight: normal;
+    display: block !important;
+    z-index: 2147483647 !important;
+    position:absolute !important;
+    text-align: center !important;
+}
+
+.es-asda-single-product {
+    font-size: x-small;
+    font-weight: normal;
+    display: block !important;
+    z-index: 2147483647 !important;
+    position:absolute !important;
+}
+
+.es-asda-mini-trolley {
+    font-size: x-small;
+    line-height: 1em;
+    font-weight: normal;
+    display: block !important;
+    z-index: 2147483647 !important;
+    position:absolute !important;
 }
 
