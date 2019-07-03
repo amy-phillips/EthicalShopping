@@ -32,6 +32,7 @@
     min-height: 50px !important;
     max-height: 70px !important;
     border: 0;
+    vertical-align: middle !important;
 }
 
 .es-img-32 {
@@ -89,6 +90,20 @@
 }
 
 .es-ocado-search-result {
+    font-size: x-small;
+    text-align: center !important;
+    line-height: 0;
+    display: block;
+}
+
+.es-ocado-single-product {
+    font-size: x-small;
+    text-align: center !important;
+    line-height: 0;
+    display: block;
+}
+
+.es-ocado-basket {
     font-size: x-small;
     text-align: center !important;
     line-height: 0;

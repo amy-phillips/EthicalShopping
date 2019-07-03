@@ -2,49 +2,7 @@
 
 
 
-function apply_colour(product_div,colour_div,best_match,link_class) {
-    colour_div.style.backgroundColor = best_match.colour; 
 
-    // add a button to link to ethical consumer site for moar infos
-    var link = document.createElement('a');
-    var img=document.createElement('img');
-    img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
-    img.setAttribute("alt", "Ethical Shopping Helper Logo");
-    if(link_class==null) { // no link class means we have more space so can be more verbose
-        img.className="es-img-32";
-    } else {
-        img.className="es-img-16";
-    }
-    link.appendChild(img);
-    var linkText = document.createTextNode("("+best_match.bb.title+")");
-    if(link_class==null) { // no link class means we have more space so can be more verbose
-        linkText = document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
-    }
-    if(DEBUGGING) {
-        linkText = document.createTextNode("More details ("+best_match.bb.title+") ("+best_match.product_name+") ("+best_match.matchiness+") at "+best_match.bb.link);
-    } 
-    link.appendChild(linkText);
-    link.title = "For more details click here to go to the ethical consumer website";
-    link.href = best_match.bb.link;
-    link.setAttribute('target','_blank');
-    link.addEventListener('click', (e) => { e.stopPropagation(); }, false);
-    if(link_class) {
-        link.className=link_class;
-    }
-    link.id='es-moar-infos';
-    product_div.after(link);
-}
-
-function colour_product(munged_tables, product_div, colour_div, raw_product_name, link_class) {
-    // is this a best buy?
-    var best_match=get_best_match(munged_tables, raw_product_name);
-    if(best_match!=null && best_match.matchiness>FUZZY_MATCH_THRESHOLD) {
-        apply_colour(product_div,colour_div,best_match,link_class);
-    } else if(DEBUGGING) {
-        best_match.colour=DEBUG_COLOUR;
-        apply_colour(product_div,colour_div,best_match,link_class);
-    }
-}   
 
 function ocado_get_product_name(product_div) {
     let el;
@@ -82,16 +40,13 @@ function colour_page(response) {
     // grab all the tables for all the product types and munge them into a big useful struct
     munged_tables=get_munged_tables(response);
 
-
-    // todo try `document.querySelector` and `document.querySelectorAll`
-    
     // find the products
     // search results
     document.querySelectorAll('.fop-title').forEach( function( product_div ){
         // has it already been coloured?
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var title=ocado_get_product_name(product_div);
-            colour_product(munged_tables, product_div, product_div.parentNode.parentNode.parentNode.parentNode, title, 'es-ocado-search-result');
+            colour_product(munged_tables, product_div, product_div.parentNode.parentNode.parentNode.parentNode, 'es-ocado-search-result', true, title);
         }
     });
 
@@ -99,7 +54,7 @@ function colour_page(response) {
     document.querySelectorAll('.productTitle').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var title=ocado_get_product_name(product_div);
-            colour_product(munged_tables, product_div, product_div.parentNode.parentNode, title);
+            colour_product(munged_tables, product_div, product_div.parentNode.parentNode, 'es-ocado-single-product', true, title);
         }
     });
 
@@ -107,7 +62,7 @@ function colour_page(response) {
     document.querySelectorAll('.trolleyTextTitle').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var title=ocado_get_product_name(product_div);
-            colour_product(munged_tables, product_div, product_div.parentNode, title);
+            colour_product(munged_tables, product_div, product_div.parentNode, 'es-ocado-basket', true, title);
         }
     });
 

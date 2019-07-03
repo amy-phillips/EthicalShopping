@@ -115,6 +115,50 @@ function display_call_to_login_if_necessary(response) {
     }
 }
 
+function apply_colour(product_div,colour_div,css_class,short_text,best_match) {
+    colour_div.style.backgroundColor = best_match.colour; 
+
+    // add a button to link to ethical consumer site for moar infos
+    var link = document.createElement('a');
+    var img=document.createElement('img');
+    img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
+    img.setAttribute("alt", "Ethical Shopping Helper Logo");
+    if(short_text) { // no link class means we have more space so can be more verbose
+        img.className="es-img-16";
+    } else {
+        img.className="es-img-32";
+    }
+    link.appendChild(img);
+    var linkText = document.createTextNode("("+best_match.bb.title+")");
+    if(!short_text) { // more space so can be more verbose
+        linkText = document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
+    }
+    if(DEBUGGING) {
+        linkText = document.createTextNode("More details ("+best_match.bb.title+") ("+best_match.product_name+") ("+best_match.matchiness+") at "+best_match.bb.link);
+    } 
+    link.appendChild(linkText);
+    link.title = "For more details click here to go to the ethical consumer website";
+    link.href = best_match.bb.link;
+    link.setAttribute('target','_blank');
+    link.addEventListener('click', (e) => { e.stopPropagation(); }, false);
+    if(css_class) {
+        link.className=css_class;
+    }
+    link.id='es-moar-infos';
+    product_div.after(link); //product_div.parentNode.appendChild(link);
+}
+
+function colour_product(munged_tables,product_div,colour_div,css_class,short_text,raw_product_name) {
+    // is this a best buy?
+    var best_match=get_best_match(munged_tables, raw_product_name);
+    if(best_match!=null && best_match.matchiness>FUZZY_MATCH_THRESHOLD) {
+        apply_colour(product_div,colour_div,css_class,short_text,best_match);
+    } else if(DEBUGGING) {
+        best_match.colour=DEBUG_COLOUR;
+        apply_colour(product_div,colour_div,css_class,short_text,best_match);
+    }
+}   
+
 
 function get_score_tables() {
     chrome.runtime.sendMessage({command: "get_score_tables"}, function(response) {
