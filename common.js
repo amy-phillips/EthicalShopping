@@ -8,7 +8,7 @@ const DEBUG_COLOUR='#FFFF00';
 // 0 for no extra debug
 // 1 to colour the background of every product considered
 // 2 for more details about why a product doesn't match
-const DEBUGGING=0;
+const DEBUGGING=1;
 
 function get_best_match(munged_tables, raw_product_name) {
     // strip off (2 pint)
@@ -125,6 +125,8 @@ function apply_colour(product_div,colour_div,css_class,short_text,best_match) {
     var link = document.createElement('a');
     var table = document.createElement('table');
     table.style.backgroundColor=best_match.colour;
+    table.style.marginLeft='auto';
+    table.style.marginRight='auto'; // centre the table
     var row = table.insertRow(0);
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);

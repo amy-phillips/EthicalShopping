@@ -16,7 +16,7 @@ function colour_page(response) {
             while(tile_content && tile_content.classList && !tile_content.classList.contains("product")) {
                 tile_content=tile_content.parentNode;
             }
-            if(!tile_content) {
+            if(!tile_content || !tile_content.classList) {
                 console.log("Error: failed to find tile_content node for "+product_div.textContent.trim());
                 tile_content=product_div.parentNode;
             }
@@ -33,7 +33,7 @@ function colour_page(response) {
             while(tile_content && tile_content.classList && !tile_content.classList.contains("productESpot")) {
                 tile_content=tile_content.parentNode;
             }
-            if(!tile_content) {
+            if(!tile_content || !tile_content.classList) {
                 console.log("Failed to find tile_content node for "+product_div.textContent.trim()+" probably not a before you go - not colouring");
                 return;
             }
@@ -45,10 +45,10 @@ function colour_page(response) {
     document.querySelectorAll('.productTitleDescriptionContainer h1').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var tile_content=product_div.parentNode;
-            while(tile_content && !tile_content.classList.contains("productSummary")) {
+            while(tile_content && tile_content.classList && !tile_content.classList.contains("productSummary")) {
                 tile_content=tile_content.parentNode;
             }
-            if(!tile_content) {
+            if(!tile_content || !tile_content.classList) {
                 console.log("Error: failed to find tile_content node for "+product_div.textContent.trim());
                 tile_content=product_div.parentNode;
             }

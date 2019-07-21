@@ -127,29 +127,26 @@
     font-weight: normal;
 }
 
+[class^="es-asda-"] {
+    display: block !important;
+    z-index: 2147483647 !important;
+    position: relative !important;
+    text-align: center !important;
+}
+
 .es-asda-search-result {
     font-size: x-small;
     font-weight: normal;
-    display: block !important;
-    z-index: 2147483647 !important;
-    position:absolute !important;
-    text-align: center !important;
 }
 
 .es-asda-single-product {
     font-size: x-small;
     font-weight: normal;
-    display: block !important;
-    z-index: 2147483647 !important;
-    position:absolute !important;
 }
 
 .es-asda-mini-trolley {
     font-size: x-small;
     line-height: 1em;
     font-weight: normal;
-    display: block !important;
-    z-index: 2147483647 !important;
-    position:absolute !important;
 }
 
