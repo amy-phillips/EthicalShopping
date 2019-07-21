@@ -35,22 +35,21 @@
     vertical-align: middle !important;
 }
 
+[class^="es-img-"] {
+    max-width: none !important;
+    max-height: none !important;
+    display: block !important;
+    position:static !important;
+}
+
 .es-img-32 {
     width: 32px !important;
     height: 32px !important;
-    max-width: none !important;
-    max-height: none !important;
-    float: left !important;
-    position:static !important;
 }
 
 .es-img-16 {
     width: 16px !important;
     height: 16px !important;
-    max-width: none !important;
-    max-height: none !important;
-    float: left !important;
-    position:static !important;
 }
 
 .es-popup {
@@ -73,12 +72,14 @@
 .es-sainsbury-single-product {
     font-size: x-small;
     font-weight: normal;
+    text-align: center !important;
     display: block !important;
 }
 
 .es-sainsbury-shopping-basket {
     font-size: x-small;
     font-weight: normal;
+    text-align: center !important;
     display: block !important;
 }
 

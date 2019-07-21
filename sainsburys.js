@@ -13,7 +13,7 @@ function colour_page(response) {
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             // find the product div
             var tile_content=product_div.parentNode;
-            while(tile_content && !tile_content.classList.contains("product")) {
+            while(tile_content && tile_content.classList && !tile_content.classList.contains("product")) {
                 tile_content=tile_content.parentNode;
             }
             if(!tile_content) {
@@ -30,12 +30,12 @@ function colour_page(response) {
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             // find the product div
             var tile_content=product_div.parentNode;
-            while(tile_content && !tile_content.classList.contains("productESpot")) {
+            while(tile_content && tile_content.classList && !tile_content.classList.contains("productESpot")) {
                 tile_content=tile_content.parentNode;
             }
             if(!tile_content) {
-                console.log("Error: failed to find tile_content node for "+product_div.textContent.trim());
-                tile_content=product_div.parentNode;
+                console.log("Failed to find tile_content node for "+product_div.textContent.trim()+" probably not a before you go - not colouring");
+                return;
             }
             colour_product(munged_tables, product_div, tile_content, "es-sainsbury-search-result", true, product_div.querySelector("a").textContent.trim());
         }
@@ -64,10 +64,17 @@ function colour_page(response) {
     });
 
     //little trolley at the side
-    document.querySelectorAll('#trolleyTableBody .product > a').forEach( function( product_div ){
-        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
-            colour_product(munged_tables, product_div, product_div.parentNode, "es-sainsbury-mini-trolley", true, product_div.textContent.trim());
-        }
+    document.querySelectorAll('#trolleyTableBody').forEach( function( trolley_div ){
+        console.log("doing trolley");
+        // find all the products
+        trolley_div.querySelectorAll('.product').forEach( function( product_div ){
+            console.log("doing trolley product");
+            // and finally find the a linky doodah
+            var linky_seggy=product_div.querySelector('a');
+            if(!linky_seggy.parentNode.querySelector('#es-moar-infos')) {
+                colour_product(munged_tables, linky_seggy, linky_seggy.parentNode, "es-sainsbury-mini-trolley", true, linky_seggy.textContent.trim());
+            }
+        });
     });
 }
 

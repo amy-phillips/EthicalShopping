@@ -4,8 +4,11 @@ const AVG_COLOUR='#FFCE79';
 const GOOD_COLOUR='#b5ffb6';
 const DEBUG_COLOUR='#FFFF00';
 
-
-const DEBUGGING=0;
+// set to 
+// 0 for no extra debug
+// 1 to colour the background of every product considered
+// 2 for more details about why a product doesn't match
+const DEBUGGING=1;
 
 function get_best_match(munged_tables, raw_product_name) {
     // strip off (2 pint)
@@ -120,6 +123,15 @@ function apply_colour(product_div,colour_div,css_class,short_text,best_match) {
 
     // add a button to link to ethical consumer site for moar infos
     var link = document.createElement('a');
+    var table = document.createElement('table');
+    table.style.backgroundColor=best_match.colour;
+    var row = table.insertRow(0);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    cell1.style.borderStyle='hidden';
+    cell1.style.textAlign='right';
+    cell2.style.borderStyle='hidden';
+    cell2.style.textAlign='left';
     var img=document.createElement('img');
     img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
     img.setAttribute("alt", "Ethical Shopping Helper Logo");
@@ -128,15 +140,16 @@ function apply_colour(product_div,colour_div,css_class,short_text,best_match) {
     } else {
         img.className="es-img-32";
     }
-    link.appendChild(img);
+    cell1.appendChild(img);
     var linkText = document.createTextNode("("+best_match.bb.title+")");
     if(!short_text) { // more space so can be more verbose
         linkText = document.createTextNode("More details ("+best_match.bb.title+") at "+best_match.bb.link);
     }
-    if(DEBUGGING) {
+    if(DEBUGGING>=2) {
         linkText = document.createTextNode("More details ("+best_match.bb.title+") ("+best_match.product_name+") ("+best_match.matchiness+") at "+best_match.bb.link);
     } 
-    link.appendChild(linkText);
+    cell2.appendChild(linkText);
+    link.appendChild(table);
     link.title = "For more details click here to go to the ethical consumer website";
     link.href = best_match.bb.link;
     link.setAttribute('target','_blank');
@@ -153,7 +166,7 @@ function colour_product(munged_tables,product_div,colour_div,css_class,short_tex
     var best_match=get_best_match(munged_tables, raw_product_name);
     if(best_match!=null && best_match.matchiness>FUZZY_MATCH_THRESHOLD) {
         apply_colour(product_div,colour_div,css_class,short_text,best_match);
-    } else if(DEBUGGING) {
+    } else if(DEBUGGING>=1) {
         best_match.colour=DEBUG_COLOUR;
         apply_colour(product_div,colour_div,css_class,short_text,best_match);
     }

@@ -51,6 +51,14 @@ function colour_page(response) {
     });
 
     //viewing single product
+    document.querySelectorAll('.bop-title').forEach( function( product_div ){
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
+            var title=ocado_get_product_name(product_div);
+            colour_product(munged_tables, product_div, product_div.parentNode.parentNode, 'es-ocado-single-product', true, title);
+        }
+    });
+
+    // rhs - 'are you sure you don't need?'
     document.querySelectorAll('.productTitle').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var title=ocado_get_product_name(product_div);
