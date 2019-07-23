@@ -1,9 +1,4 @@
 
-
-function insertAfter(newNode, referenceNode) {
-    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-}
-
 function colour_page(response) {
     // grab all the tables for all the product types and munge them into a big useful struct
     munged_tables=get_munged_tables(response);

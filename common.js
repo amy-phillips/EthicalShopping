@@ -82,11 +82,17 @@ function display_call_to_login_if_necessary(response) {
         cell1.setAttribute("width", "40px");
         //cell1.setAttribute("border", "0 !important");
 
+        var imglink = document.createElement('a');
+        imglink.href = "https://www.ethicalconsumer.org";
+        imglink.setAttribute('target','_blank');
+
         var img=document.createElement('img');
         img.setAttribute("src", chrome.extension.getURL("images/icon32.png"));
         img.setAttribute("alt", "Ethical Shopping Helper Logo");
         img.className = "es-img-32"
-        cell1.appendChild(img);
+        imglink.appendChild(img);
+
+        cell1.appendChild(imglink);
         cell1.className = "es-login_or_subscribe-td";
 
         var cell2 = row.insertCell(1);

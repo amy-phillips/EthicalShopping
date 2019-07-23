@@ -62,6 +62,7 @@
     margin-right: 10px;
 }
 
+/***************************** sainsbury *******************************/
 .es-sainsbury-search-result {
     font-size: x-small;
     font-weight: normal;
@@ -90,6 +91,7 @@
     display: block !important;
 }
 
+/***************************** ocado *******************************/
 .es-ocado-search-result {
     font-size: x-small;
     text-align: center !important;
@@ -111,6 +113,7 @@
     display: block;
 }
 
+/***************************** tesco *******************************/
 .es-tesco-mini-trolley {
     font-size: x-small;
     line-height: 1em;
@@ -127,6 +130,7 @@
     font-weight: normal;
 }
 
+/***************************** asda *******************************/
 [class^="es-asda-"] {
     display: block !important;
     z-index: 2147483647 !important;
@@ -150,3 +154,14 @@
     font-weight: normal;
 }
 
+/***************************** boots *******************************/
+[class^="es-boots-"] {
+    display: block !important;
+    z-index: 2147483647 !important;
+    position: relative !important;
+    text-align: center !important;
+}
+
+.es-boots-search-result {
+    font-size: x-small;
+}

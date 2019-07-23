@@ -36,15 +36,17 @@
       "matches": ["https://groceries.asda.com/*"],
       "js": ["matchymcmatchypants.js", "common.js", "asda.js"],
       "css": ["css/ethics.css"]
+    },
+    {
+      "matches": ["https://www.boots.com/*"],
+      "js": ["matchymcmatchypants.js", "common.js", "boots.js"],
+      "css": ["css/ethics.css"]
     }
   ],
 
   "web_accessible_resources": ["images/icon32.png"],
 
   "permissions": [
-    "https://www.sainsburys.co.uk/*",
-    "https://www.ocado.com/*",
-    "https://www.tesco.com/groceries/*",
     "https://www.ethicalconsumer.org/*"
   ]
 }
