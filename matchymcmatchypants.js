@@ -66,6 +66,7 @@ String.prototype.plural = function(revert){
         'bean'   : 'beanz', // for heinz
         'spread' : 'spreadable', //yes this is abusing the concept of plurality - sorry not sorry!
         'cereal' : 'muesli',
+        'bread'  : 'loaf',
     };
 
     var uncountable = [
@@ -122,15 +123,21 @@ function pre_process(name) {
     name=name.replace(ETHICAL_CONSUMER_MARKUP,'');
     // remove accented characters https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
     name=name.normalize('NFD');
-    name=name.replace('-',' '); //washing-up should become washing up, rather than washingup
+    //use a regex rather than a string as the replace arg because we want to replace all instances, not just the first
+    name=name.replace(/\-/gi,' '); //washing-up should become washing up, rather than washingup
     name=name.replace(PUNCTUATION,'');
-    name=name.replace('tinned','');
-    name=name.replace('MSC','');
+    name=name.replace(/tinned/gi,'');
+    name=name.replace(/MSC/gi,'');
     //ethical consumer is all american with their laundry detergent
     name=name.replace(/washing (powder|gel|liquid|capsules)/gi,'laundry detergent');
     name=name.replace(/laundry liquid/gi,'laundry detergent');
     name=name.replace(/washing powder and liquid/gi,'laundry detergent');
     name=name.replace(/dishwasher (powder|tablets)/gi,'dishwasher detergent');
+    // the type of squash doesn't match for Rocks so remove the flavour
+    name=name.replace(/(blackcurrant|orange) squash/gi,'squash');
+    // the flavour of bio-d washing up liquid doesn't matter either
+    //name=name.replace(/(lavender) laundry detergent/gi,'laundry detergent');
+    name=name.replace(/jaffa cake/gi,'biscuit');
     name=name.trim();
    
     // split into words, make all lowercase, and not plural

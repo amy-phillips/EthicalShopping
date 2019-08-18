@@ -24,6 +24,24 @@ function colour_page(response) {
         }
     });
 
+    // favourites new layout with hidden trolley
+    document.querySelectorAll('.pt__info__description').forEach( function( product_div ){
+        // has it already been coloured?
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
+            // find the product div
+            var tile_content=product_div.parentNode;
+            while(tile_content && tile_content.classList && !tile_content.classList.contains("pt__content")) {
+                tile_content=tile_content.parentNode;
+            }
+            if(!tile_content || !tile_content.classList) {
+                console.log("Error: failed to find pt__content node for "+product_div.textContent.trim());
+                tile_content=product_div.parentNode;
+            }
+            colour_product(munged_tables, product_div, tile_content, "es-sainsbury-search-result", true, product_div.querySelector("a").textContent.trim());
+        }
+    });
+
+
     // "before you go" (as checking out)
     document.querySelectorAll('.productNameAndPromotions').forEach( function( product_div ){
         // has it already been coloured?
@@ -37,7 +55,7 @@ function colour_page(response) {
                 console.log("Failed to find tile_content node for "+product_div.textContent.trim()+" probably not a before you go - not colouring");
                 return;
             }
-            colour_product(munged_tables, product_div, tile_content, "es-sainsbury-search-result", true, product_div.querySelector("a").textContent.trim());
+            colour_product(munged_tables, product_div, tile_content, "es-sainsbury-search-result", true, product_div.textContent.trim());
         }
     });
 
@@ -58,6 +76,12 @@ function colour_page(response) {
 
     //shopping basket
     document.querySelectorAll('.productContainer > a').forEach( function( product_div ){
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
+            colour_product(munged_tables, product_div, product_div.parentNode, "es-sainsbury-shopping-basket", true, product_div.textContent.trim());
+        }
+    });
+    // favourites pop up shopping basket
+    document.querySelectorAll('.pt-mini__title').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             colour_product(munged_tables, product_div, product_div.parentNode, "es-sainsbury-shopping-basket", true, product_div.textContent.trim());
         }

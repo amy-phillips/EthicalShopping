@@ -165,3 +165,14 @@
 .es-boots-search-result {
     font-size: x-small;
 }
+
+/***************************** milkandmore *******************************/
+[class^="es-mam-"] {
+    display: block !important;
+    position: relative !important;
+    text-align: center !important;
+}
+
+.es-mam-search-result {
+    font-size: x-small;
+}

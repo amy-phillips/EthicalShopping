@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Ethical Shopping Helper",
-  "description": "Helps you make ethical shopping decisions on the Sainsburys/Tesco/Asda/Ocado websites based on data from Ethical Consumer Score Tables",
+  "description": "Helps you make ethical shopping decisions on the Sainsburys/Tesco/Ocado/.. websites based on data from Ethical Consumer Score Tables",
   "version": "0.8",
 
   "browser_action": {
@@ -40,6 +40,11 @@
     {
       "matches": ["https://www.boots.com/*"],
       "js": ["matchymcmatchypants.js", "common.js", "boots.js"],
+      "css": ["css/ethics.css"]
+    },
+    {
+      "matches": ["https://www.milkandmore.co.uk/*"],
+      "js": ["matchymcmatchypants.js", "common.js", "milkandmore.js"],
       "css": ["css/ethics.css"]
     }
   ],
