@@ -60,6 +60,7 @@ function onFoodReceived(foods,sendResponse) {
         subscription_to_send=gSubscription;
     }
 
+    set_done_icon();
     console.log(gScoreTables);
     sendResponse({"scores":gScoreTables,"subscription":subscription_to_send});
 }
@@ -136,6 +137,7 @@ async function getScoreTables(foods, subscribe, sendResponse) {
 
             const data = await response.text();
                 
+            update_busy_icon();
             var food_title=null;
             var title = /<h1 class="title">\s*([\w\s&;,-]+?)[\s]*</.exec(data);
             if(title) {
@@ -171,6 +173,7 @@ async function getScoreTables(foods, subscribe, sendResponse) {
             onFoodReceived(foods,sendResponse);
         } catch (error) {
             gScoreTables[food] = { error, data: {} };
+            update_busy_icon();
             onFoodReceived(foods,sendResponse);
         }
     }
@@ -201,8 +204,35 @@ function parseProductGuides(productselector,page_html) {
     return foods;
 }
 
+var gBusyStart=-1;
+var gIconTime=-1;
+const NUM_ICONS=3;
+function set_done_icon() {
+    gBusyStart=-1;
+    chrome.browserAction.setIcon({
+        path : "images/icon32.png"
+    });
+}
+function update_busy_icon() {
+    if(gBusyStart==-1) {
+        gBusyStart=new Date();
+    }
+    var now=new Date();
+    var seconds = Math.floor((now-gBusyStart)/1000);
+    console.log(seconds);
+    if(seconds!=gIconTime) {
+        gIconTime=seconds;
+        // swap to a busy icon
+        var icon_number=seconds%NUM_ICONS;
+        chrome.browserAction.setIcon({
+            path : "images/busy"+icon_number+".png"
+        });
+    }
+}
+
 async function lookupGuides(sendResponse) {
     // never use cached data for the list of foods - we also use this request to check if the player is subscribed to EC 
+    update_busy_icon();
 
     // which guides are available?
     try {
@@ -237,9 +267,11 @@ async function lookupGuides(sendResponse) {
         var index = foods.indexOf('/health-beauty/shopping-guide/perfume-shops');
         if (index !== -1) foods.splice(index, 1);
 
+        update_busy_icon();
         getScoreTables(foods, subscribe, sendResponse);                
     }
     catch (error) {
+        set_done_icon();
         sendResponse({ error, data: {} });
     }
 }

@@ -138,6 +138,9 @@ function pre_process(name) {
     // the flavour of bio-d washing up liquid doesn't matter either
     //name=name.replace(/(lavender) laundry detergent/gi,'laundry detergent');
     name=name.replace(/jaffa cake/gi,'biscuit');
+    // milk&more doesn't list kingsmill bread as bread, so add in the keyword bread to make it match
+    name=name.replace(/allinsons .* (white|wholemeal)/gi,'allinsons bread');
+    name=name.replace(/kingsmill (super seeds|5050|wholemeal|tasty wholemeal|soft white)/gi,'kingsmill bread');
     name=name.trim();
    
     // split into words, make all lowercase, and not plural
