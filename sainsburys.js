@@ -13,11 +13,11 @@ function colour_page(response) {
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             // find the product div
             var tile_content=product_div.parentNode;
-            while(tile_content && tile_content.classList && !tile_content.classList.contains("product")) {
+            while(tile_content && tile_content.classList && !tile_content.classList.contains("productInfo")) {
                 tile_content=tile_content.parentNode;
             }
             if(!tile_content || !tile_content.classList) {
-                console.log("Error: failed to find tile_content node for "+product_div.textContent.trim());
+                console.log("Error: failed to find productInfo node for "+product_div.textContent.trim());
                 tile_content=product_div.parentNode;
             }
             colour_product(munged_tables, product_div, tile_content, "es-sainsbury-search-result", true, product_div.querySelector("a").textContent.trim());
@@ -30,11 +30,11 @@ function colour_page(response) {
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             // find the product div
             var tile_content=product_div.parentNode;
-            while(tile_content && tile_content.classList && !tile_content.classList.contains("pt__content")) {
+            while(tile_content && tile_content.classList && !tile_content.classList.contains("pt__info")) {
                 tile_content=tile_content.parentNode;
             }
             if(!tile_content || !tile_content.classList) {
-                console.log("Error: failed to find pt__content node for "+product_div.textContent.trim());
+                console.log("Error: failed to find pt__info node for "+product_div.textContent.trim());
                 tile_content=product_div.parentNode;
             }
             colour_product(munged_tables, product_div, tile_content, "es-sainsbury-search-result", true, product_div.querySelector("a").textContent.trim());
@@ -103,5 +103,5 @@ function colour_page(response) {
 }
 
 function get_header_location() {
-    return document.querySelector('#globalHeaderContainer');
+    return document.querySelector('#globalHeaderContainer') || document.querySelector('.ln-o-page__header');
 }
