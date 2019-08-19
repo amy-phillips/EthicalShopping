@@ -54,7 +54,7 @@ function colour_page(response) {
     document.querySelectorAll('.bop-title').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var title=ocado_get_product_name(product_div);
-            colour_product(munged_tables, product_div, product_div.parentNode.parentNode, 'es-ocado-single-product', true, title);
+            colour_product(munged_tables, product_div, product_div.parentNode, 'es-ocado-single-product', true, title);
         }
     });
 
