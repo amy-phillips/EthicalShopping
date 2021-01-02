@@ -251,9 +251,9 @@ async function lookupGuides(sendResponse) {
         
         var foods=[];
         // parse out product guides - food and drink
-        foods=foods.concat(parseProductGuides('<a class="more" href="\/food-drink">Read more about Food &amp; Drink<\/a>',data));
+        foods=foods.concat(parseProductGuides('<a class="more" href="\/food-drink">Food &amp; Drink guides, news and features<\/a>',data));
         //health and beauty
-        foods=foods.concat(parseProductGuides('<a class="more" href="/health-beauty">Read more about Health &amp; Beauty</a>',data));
+        foods=foods.concat(parseProductGuides('<a class="more" href="/health-beauty">Health &amp; Beauty guides, news and features</a>',data));
 
         // some more products that are stocked by supermarkets - don;t want all of home and garden tho
         foods.push('/home-garden/shopping-guide/dishwasher-detergent');
@@ -263,7 +263,7 @@ async function lookupGuides(sendResponse) {
         foods.push('/home-garden/shopping-guide/toilet-paper');
         foods.push('/home-garden/shopping-guide/washing-liquid');
 
-        // strip out perfume shops because it has short names and doesn;t help
+        // strip out perfume shops because it has short names and doesn't help
         var index = foods.indexOf('/health-beauty/shopping-guide/perfume-shops');
         if (index !== -1) foods.splice(index, 1);
 
