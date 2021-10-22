@@ -60,7 +60,7 @@ function colour_page(response) {
     });
 
     //viewing single product
-    document.querySelectorAll('.productTitleDescriptionContainer h1').forEach( function( product_div ){
+    document.querySelectorAll('.pd__wrapper h1').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             var tile_content=product_div.parentNode;
             while(tile_content && tile_content.classList && !tile_content.classList.contains("productSummary")) {
