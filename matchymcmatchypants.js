@@ -115,51 +115,124 @@ String.prototype.plural = function(revert){
 }
 
 // matches [a], [o], [a,o] etc
-var ETHICAL_CONSUMER_MARKUP = /\[[afgorsv\s]+(?:,[afgorsv\s]+)*\]/gmi;
+var ETHICAL_CONSUMER_MARKUP = /\[[afgorsv\s]+(?:,[afgorsv\s]+)*,?\]/gmi;
 var PUNCTUATION = /[^\w\s]/gmi;
 
-function pre_process(name) {
-    // remove any [a] or [o] etc from ethical consumer
-    name=name.replace(ETHICAL_CONSUMER_MARKUP,'');
-    // remove accented characters https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
-    name=name.normalize('NFD');
-    //use a regex rather than a string as the replace arg because we want to replace all instances, not just the first
-    name=name.replace(/\-/gi,' '); //washing-up should become washing up, rather than washingup
-    name=name.replace(PUNCTUATION,'');
-    name=name.replace(/tinned/gi,'');
-    name=name.replace(/MSC/gi,'');
-    //ethical consumer is all american with their laundry detergent
-    name=name.replace(/washing (powder|gel|liquid|capsules)/gi,'laundry detergent');
-    name=name.replace(/laundry liquid/gi,'laundry detergent');
-    name=name.replace(/washing powder and liquid/gi,'laundry detergent');
-    name=name.replace(/dishwasher (powder|tablets)/gi,'dishwasher detergent');
-    // the type of squash doesn't match for Rocks so remove the flavour
-    name=name.replace(/(blackcurrant|orange) squash/gi,'squash');
-    // the flavour of bio-d washing up liquid doesn't matter either
-    //name=name.replace(/(lavender) laundry detergent/gi,'laundry detergent');
-    name=name.replace(/jaffa cake/gi,'biscuit');
-    // milk&more doesn't list kingsmill bread as bread, so add in the keyword bread to make it match
-    name=name.replace(/allinsons .* (white|wholemeal)/gi,'allinsons bread');
-    name=name.replace(/kingsmill (super seeds|5050|wholemeal|tasty wholemeal|soft white)/gi,'kingsmill bread');
-    name=name.trim();
-   
-    // split into words, make all lowercase, and not plural
-    var plurals = name.toLowerCase().split(/\s+/);
-    var singles=[];
+// takes the title of an ethical consumer section and processes it into keywords you'd expect to find in a food title - eg coffee
+function pre_process_food(name) {
+ 
+    processed=name.replace('&',' ');
+    processed=processed.replace(/\-/gi,' '); //washing-up should become washing up, rather than washingup
+
+    var plurals = processed.toLowerCase().split(/\s+/);
+    var singles=new Set(); // no dups plz
     for(let word of plurals) {
         var single=word.plural(true);
-        if (singles.indexOf(single)==-1) singles.push(single); // no dups plz
+        singles.add(single);
     }
-    //console.log(name + " becomes:");
-    //console.log(singles);
-    return {"name":name,"words":singles};
+
+    // title words that might not be in the product name on sainsburys so no point keeping them?
+    singles.delete('ethical');
+    singles.delete('vegan');
+    singles.delete('dairy');
+    singles.delete('free');
+    singles.delete('and');
+
+    console.log(name + " ("+processed+") becomes:");
+    console.log(singles);
+    // we want at least one of these words to match in food description, but don't require them all
+    return {"name":name,"all_of":[],"one_of":Array.from(singles)};
+}
+
+function pre_process(name,pre_processed_food=null) {
+    // remove any [a] or [o] etc from ethical consumer
+    processed=name.replace(ETHICAL_CONSUMER_MARKUP,'');
+    // remove accented characters https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
+    processed=processed.normalize('NFD');
+    //use a regex rather than a string as the replace arg because we want to replace all instances, not just the first
+    processed=processed.replace(/\-/gi,' '); //washing-up should become washing up, rather than washingup
+    processed=processed.replace(PUNCTUATION,'');
+    processed=processed.replace(/tinned/gi,'');
+    processed=processed.replace(/MSC/gi,'');
+    //ethical consumer is all american with their laundry detergent
+    processed=processed.replace(/washing (powder|gel|liquid|capsules)/gi,'laundry detergent');
+    processed=processed.replace(/laundry liquid/gi,'laundry detergent');
+    processed=processed.replace(/washing powder and liquid/gi,'laundry detergent');
+    processed=processed.replace(/dishwasher (powder|tablets)/gi,'dishwasher detergent');
+    // the type of squash doesn't match for Rocks so remove the flavour
+    processed=processed.replace(/(blackcurrant|orange) squash/gi,'squash');
+    // the flavour of bio-d washing up liquid doesn't matter either
+    //processed=processed.replace(/(lavender) laundry detergent/gi,'laundry detergent');
+    processed=processed.replace(/jaffa cake/gi,'biscuit');
+    // milk&more doesn't list kingsmill bread as bread, so add in the keyword bread to make it match
+    processed=processed.replace(/allinsons .* (white|wholemeal)/gi,'allinsons bread');
+    processed=processed.replace(/kingsmill (super seeds|5050|wholemeal|tasty wholemeal|soft white)/gi,'kingsmill bread');
+    // don't care if Kelly's ice cream is in tubs!
+    processed=processed.replace(/tubs/gi,'');
+    processed=processed.replace(/of cornwall/gi,'cornish');
+    // Haagen Dazs ice cream outside USA
+    processed=processed.replace(/outside USA/gi,'');
+    // Wall's ice cream & lollies - let's just pretend lollies are ice cream
+    processed=processed.replace(/lollies/gi,'ice cream');
+    processed=processed.trim();
+   
+    // split into words, make all lowercase, and not plural
+    var plurals = processed.toLowerCase().split(/\s+/);
+    var singles=new Set(); // no dups plz
+    for(let word of plurals) {
+        var single=word.plural(true);
+        singles.add(single);
+    }
+
+    // a bunch of coffee is listed like ground, beans & instant, or beans & ground, or ground & beans,
+    // but we don't want to contaminate baked beans
+    coffee_like=0;
+    coffee_words = new Set(['ground', 'bean', 'instant', 'coffee'])
+    for(let word of singles) {
+        if(coffee_words.has(word)) {
+            coffee_like++;
+        }
+    }
+    if(coffee_like>=2) { // joyful magical number threshold gogogogo :)
+        // it's all just coffee innit?
+        singles.delete('ground');
+        singles.delete('bean');
+        singles.delete('instant');
+        singles.add('coffee');
+    }
+
+    // if this was in a well-named section on ethical consumer, add that too
+    one_of = new Set();
+    if (pre_processed_food) {
+        pre_processed_food.all_of.forEach(singles.add, singles);
+        pre_processed_food.one_of.forEach(one_of.add, one_of);
+
+        // if any of the one_ofs are in the all_ofs, then remove them from the one_ofs, they are not adding any info!
+        singles.forEach(one_of.delete, one_of);
+    }
+
+    console.log(name + " ("+processed+") becomes:");
+    console.log(singles);
+    console.log(one_of);
+    // if this was in a well-named section on ethical consumer, add that too
+    return {"name":name,"one_of":Array.from(one_of),"all_of":Array.from(singles)};
 }
 
 // get a number between 0 (not at all matchy) and 1 (really quite matchy)
-function get_matchiness(name1, name2) {
+function get_matchiness(product_name, ec_name) {
     matching_word_count=0;
-    for(let word1 of name1.words) {
-        for(let word2 of name2.words) {
+    for(let word1 of product_name.all_of) {
+        for(let word2 of ec_name.all_of) {
+            // do the words match, either exactly or with a trailing s?
+            if(word1==word2) {
+                matching_word_count++;
+                break;
+            }
+
+            // todo similarity??
+        }
+
+        for(let word2 of ec_name.one_of) {
             // do the words match, either exactly or with a trailing s?
             if(word1==word2) {
                 matching_word_count++;
@@ -170,5 +243,5 @@ function get_matchiness(name1, name2) {
         }
     }
   
-    return matching_word_count/Math.min(name1.words.length,name2.words.length);
+    return matching_word_count/Math.min(product_name.all_of.length,(ec_name.all_of.length+ec_name.one_of.length));
 }
