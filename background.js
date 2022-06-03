@@ -146,6 +146,8 @@ async function getScoreTables(foods, subscribe, sendResponse) {
                 console.log(`Failed to parse title for ${food}`);
             }
 
+            processed_food = pre_process_food(food_title);
+
             // parse the score table
             var table = /<table class="table"(.*?)<\/table>/gms.exec(data);
             const te_regex = /<h4>([^<]*)<\/h4>(?:.*?)?<div class="score (\w+)">?/gms;
@@ -160,7 +162,7 @@ async function getScoreTables(foods, subscribe, sendResponse) {
                 var title=fixup_overly_short_titles(unescape(m[1])); // flake matches too many things - hack it!
                 table_entries[rating].push(
                     {'title':title,
-                    'preprocessed_title':pre_process(title),
+                    'preprocessed_title':pre_process(title,processed_food),
                     'link':"https://www.ethicalconsumer.org"+food+"#score-table"});
             }
 
