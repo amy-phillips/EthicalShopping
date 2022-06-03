@@ -148,7 +148,7 @@ async function getScoreTables(foods, subscribe, sendResponse) {
 
             // parse the score table
             var table = /<table class="table"(.*?)<\/table>/gms.exec(data);
-            const te_regex = /<h4>([^<]*)<\/h4>(?:.*?)+?<div class="score (\w+)">(?:.*?)+?/gms;
+            const te_regex = /<h4>([^<]*)<\/h4>(?:.*?)?<div class="score (\w+)">?/gms;
             var table_entries={'good':[],'average':[],'bad':[]};
             while ((m = te_regex.exec(table[1])) !== null) {
                 // This is necessary to avoid infinite loops with zero-width matches
@@ -244,7 +244,7 @@ async function lookupGuides(sendResponse) {
 
         // is there a call to action to subscribe?
         var subscribe=null;
-        var sub = /<button [\.\-"=\/\<>\w\s]*?value="Sign in ">Sign in[-"=\/\<>\w\s]*?<\/button>/.exec(data);
+        var sub = /<button[^>]*?value="Sign in ">/.exec(data);
         if(sub) {
             subscribe="https://www.ethicalconsumer.org/subscriptions";
         }
