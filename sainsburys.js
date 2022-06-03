@@ -88,10 +88,10 @@ function colour_page(response) {
     });
 
     //little trolley at the side
-    document.querySelectorAll('#trolleyTableBody').forEach( function( trolley_div ){
+    document.querySelectorAll('.trolley-summary__list-container').forEach( function( trolley_div ){
         console.log("doing trolley");
         // find all the products
-        trolley_div.querySelectorAll('.product').forEach( function( product_div ){
+        trolley_div.querySelectorAll('.trolley-item__product').forEach( function( product_div ){
             console.log("doing trolley product");
             // and finally find the a linky doodah
             var linky_seggy=product_div.querySelector('a');
