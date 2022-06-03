@@ -26,8 +26,15 @@ function colour_page(response) {
         }
     });
 
+    // shopping basket large
+    document.querySelectorAll('.ingredient__title').forEach( function( product_div ){
+        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
+            colour_product(munged_tables, product_div, product_div.parentNode, "es-asda-single-product", false, product_div.textContent.trim());
+        }
+    });
+
     //viewing single product
-    document.querySelectorAll('.prod-title').forEach( function( product_div ){
+    document.querySelectorAll('.pdp-main-details__title').forEach( function( product_div ){
         if(!product_div.parentNode.querySelector('#es-moar-infos')) {
             colour_product(munged_tables, product_div, product_div.parentNode, "es-asda-single-product", false, product_div.textContent.trim());
         }
