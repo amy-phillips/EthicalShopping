@@ -31,10 +31,14 @@ function colour_page(response) {
     });
 
     //little trolley at the side
-    document.querySelectorAll('.mini-tile__title-wrapper').forEach( function( product_div ){
-        if(!product_div.parentNode.querySelector('#es-moar-infos')) {
-            colour_product(munged_tables, product_div, product_div.parentNode.parentNode.parentNode, "es-tesco-mini-trolley", true, product_div.textContent.trim());
-        }
+    document.querySelectorAll("#mini-trolley").forEach( function( mini_trolley_div ){
+        console.log("doing trolley");
+        mini_trolley_div.querySelectorAll('h4').forEach( function( product_div ){
+            console.log("doing trolley item");
+            if(!product_div.parentNode.querySelector('#es-moar-infos')) {
+                colour_product(munged_tables, product_div, product_div.parentNode.parentNode.parentNode, "es-tesco-mini-trolley", true, product_div.textContent.trim());
+            }
+        });
     });
 }
 
