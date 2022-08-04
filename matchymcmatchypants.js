@@ -175,6 +175,8 @@ function pre_process(name,pre_processed_food=null) {
     processed=processed.replace(/outside USA/gi,'');
     // Wall's ice cream & lollies - let's just pretend lollies are ice cream
     processed=processed.replace(/lollies/gi,'ice cream');
+    // Good earth teabags - let's say teabags are just tea
+    processed=processed.replace(/teabags/gi,'tea');
     // the butter and spreads section is annoying - pretend they're all butter
     processed=processed.replace(/spread/gi,'butter');
     processed=processed.trim();
